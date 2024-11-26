@@ -1,0 +1,248 @@
+[gd_scene load_steps=27 format=3 uid="uid://dp75sk2nqiwgd"]
+
+[ext_resource type="Script" path="res://Nodo.gd" id="1_5na5g"]
+[ext_resource type="Texture2D" uid="uid://dulb6mutxedt7" path="res://assets/esfera.png" id="2_kfi0h"]
+[ext_resource type="PackedScene" uid="uid://c5k6y55l3uasr" path="res://Ponteiro.tscn" id="3_asyfw"]
+[ext_resource type="FontFile" uid="uid://5m5r5fu4xykb" path="res://assets/fontes/VT323-Regular.ttf" id="3_pfnuk"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_l7skv"]
+atlas = ExtResource("2_kfi0h")
+region = Rect2(0, 0, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_o3p5k"]
+atlas = ExtResource("2_kfi0h")
+region = Rect2(16, 0, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_nf7hj"]
+atlas = ExtResource("2_kfi0h")
+region = Rect2(32, 0, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_7wow8"]
+atlas = ExtResource("2_kfi0h")
+region = Rect2(48, 0, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_iudy4"]
+atlas = ExtResource("2_kfi0h")
+region = Rect2(0, 16, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_bl0k8"]
+atlas = ExtResource("2_kfi0h")
+region = Rect2(16, 16, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_qahby"]
+atlas = ExtResource("2_kfi0h")
+region = Rect2(32, 16, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_dvgh2"]
+atlas = ExtResource("2_kfi0h")
+region = Rect2(48, 16, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_q1efr"]
+atlas = ExtResource("2_kfi0h")
+region = Rect2(0, 32, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_l1t7y"]
+atlas = ExtResource("2_kfi0h")
+region = Rect2(16, 32, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_me2oy"]
+atlas = ExtResource("2_kfi0h")
+region = Rect2(32, 32, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_dgve6"]
+atlas = ExtResource("2_kfi0h")
+region = Rect2(48, 32, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_dsp77"]
+atlas = ExtResource("2_kfi0h")
+region = Rect2(0, 48, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_vsyc5"]
+atlas = ExtResource("2_kfi0h")
+region = Rect2(16, 48, 16, 16)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_v00ji"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_l7skv")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_o3p5k")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_nf7hj")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_7wow8")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_iudy4")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_bl0k8")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_qahby")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_dvgh2")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_q1efr")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_l1t7y")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_me2oy")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_dgve6")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_dsp77")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_vsyc5")
+}],
+"loop": true,
+"name": &"default",
+"speed": 6.2
+}]
+
+[sub_resource type="Animation" id="Animation_yi0ik"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:visible_ratio")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0.0]
+}
+
+[sub_resource type="Animation" id="Animation_3bnpp"]
+resource_name = "info_esmaecer"
+length = 0.5
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:visible_ratio")
+tracks/0/interp = 1
+tracks/0/loop_wrap = false
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.5),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [0.0, 1.0]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_g5pdc"]
+_data = {
+"RESET": SubResource("Animation_yi0ik"),
+"info_esmaecer": SubResource("Animation_3bnpp")
+}
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_tp88t"]
+radius = 4.03212
+
+[sub_resource type="Animation" id="Animation_cj3h1"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Esfera:rotation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0.0]
+}
+
+[sub_resource type="Animation" id="Animation_c5i8x"]
+resource_name = "nodo_rotacionar"
+length = 2.0
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Esfera:rotation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 2),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [0.0, 6.28319]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_lhma5"]
+_data = {
+"RESET": SubResource("Animation_cj3h1"),
+"nodo_rotacionar": SubResource("Animation_c5i8x")
+}
+
+[node name="Nodo" type="Node2D"]
+position = Vector2(48, 32)
+script = ExtResource("1_5na5g")
+
+[node name="Esfera" type="AnimatedSprite2D" parent="."]
+texture_filter = 1
+scale = Vector2(2, 2)
+sprite_frames = SubResource("SpriteFrames_v00ji")
+frame = 6
+frame_progress = 0.379886
+
+[node name="Info" type="Label" parent="Esfera"]
+texture_filter = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -10.5
+offset_top = -11.5
+offset_right = -5.5
+offset_bottom = -4.5
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_fonts/font = ExtResource("3_pfnuk")
+theme_override_font_sizes/font_size = 5
+text = "teste"
+horizontal_alignment = 1
+vertical_alignment = 1
+visible_characters = 0
+visible_ratio = 0.0
+metadata/_edit_use_anchors_ = true
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="Esfera/Info"]
+libraries = {
+"": SubResource("AnimationLibrary_g5pdc")
+}
+
+[node name="Area2D" type="Area2D" parent="Esfera"]
+scale = Vector2(4, 4)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Esfera/Area2D"]
+scale = Vector2(0.4, 0.4)
+shape = SubResource("CircleShape2D_tp88t")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="Esfera"]
+root_node = NodePath("../..")
+libraries = {
+"": SubResource("AnimationLibrary_lhma5")
+}
+speed_scale = 0.5
+
+[node name="Ponteiro" parent="." instance=ExtResource("3_asyfw")]
+
+[connection signal="input_event" from="Esfera/Area2D" to="." method="_on_area_2d_input_event"]
+[connection signal="mouse_entered" from="Esfera/Area2D" to="." method="_on_area_2d_mouse_entered"]
