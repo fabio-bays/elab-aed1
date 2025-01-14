@@ -1,7 +1,9 @@
-[gd_scene load_steps=3 format=3 uid="uid://brb3nqnenyjq0"]
+[gd_scene load_steps=4 format=3 uid="uid://brb3nqnenyjq0"]
 
 [ext_resource type="Script" path="res://BlocoCodigo.gd" id="1_8feg0"]
 [ext_resource type="FontFile" uid="uid://5m5r5fu4xykb" path="res://assets/fontes/VT323-Regular.ttf" id="1_qoamu"]
+
+[sub_resource type="Theme" id="Theme_2b1me"]
 
 [node name="Control" type="Control"]
 layout_mode = 3
@@ -12,6 +14,7 @@ script = ExtResource("1_8feg0")
 layout_mode = 0
 offset_right = 128.0
 offset_bottom = 72.0
+theme = SubResource("Theme_2b1me")
 
 [node name="RichTextLabel" type="RichTextLabel" parent="PanelContainer"]
 layout_mode = 2

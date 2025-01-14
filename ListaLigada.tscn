@@ -1,4 +1,4 @@
-[gd_scene load_steps=47 format=3 uid="uid://desbg5gu8oygl"]
+[gd_scene load_steps=48 format=3 uid="uid://desbg5gu8oygl"]
 
 [ext_resource type="Script" path="res://ListaLigada.gd" id="1_eru8n"]
 [ext_resource type="PackedScene" uid="uid://dp75sk2nqiwgd" path="res://Nodo.tscn" id="2_nlber"]
@@ -7,6 +7,7 @@
 [ext_resource type="Texture2D" uid="uid://cqq8u1c5d2bry" path="res://assets/null_v2.png" id="3_wjsaj"]
 [ext_resource type="Texture2D" uid="uid://c3qn4p6rbyqxi" path="res://assets/remover_x.png" id="4_5068l"]
 [ext_resource type="PackedScene" uid="uid://c5k6y55l3uasr" path="res://Ponteiro.tscn" id="4_hp48o"]
+[ext_resource type="PackedScene" uid="uid://bxyf0o6ucpnv2" path="res://ParallaxBg.tscn" id="8_jcx3j"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_45wa7"]
 atlas = ExtResource("3_wjsaj")
@@ -293,6 +294,13 @@ nodo_scene = ExtResource("2_nlber")
 bloco_codigo_scene = ExtResource("3_ca5c3")
 ponteiro_scene = ExtResource("4_hp48o")
 
+[node name="ColorRect" type="ColorRect" parent="."]
+visible = false
+offset_left = -168.0
+offset_top = -96.0
+offset_right = 168.0
+offset_bottom = 96.0
+
 [node name="Camera2D" type="Camera2D" parent="."]
 
 [node name="Botoes" type="Node2D" parent="Camera2D"]
@@ -390,25 +398,7 @@ theme_override_font_sizes/font_size = 5
 text = "0"
 horizontal_alignment = 1
 
-[node name="Nodo" parent="." instance=ExtResource("2_nlber")]
-visible = false
-position = Vector2(-66, 26)
-
-[node name="LabelPosNodosAnteriores2" type="Label" parent="Nodo"]
-editor_description = "Label usada para denotar a posição de nodos anteriores ao clicado para a remoção ou inserção iterativa. 
-
-Mantida na cena com o intuito de facilitar a edição do label para apenas duplicá-lo em código."
-offset_left = -15.0
-offset_top = -42.0
-offset_right = 15.0
-offset_bottom = -21.0
-theme_override_fonts/font = ExtResource("3_op5oh")
-theme_override_font_sizes/font_size = 5
-text = "pos_do_anterior
-=
-1"
-horizontal_alignment = 1
-metadata/_edit_use_anchors_ = true
+[node name="ParallaxBg" parent="." instance=ExtResource("8_jcx3j")]
 
 [connection signal="pressed" from="Camera2D/Botoes/Inserir" to="." method="_on_inserir_pressed"]
 [connection signal="toggled" from="Camera2D/Botoes/Inserir" to="." method="_on_inserir_toggled"]
