@@ -43,15 +43,20 @@ func highlight_str(stri : String, ocorrencia : int = 1):
 			num_char_removidos += idx + 1
 			
 	rich_text_label.set_text(texto_anterior + texto)
-	await check_view_boundaries(rich_text_label.get_character_line(
+	await check_view_boundaries_and_move(rich_text_label.get_character_line(
 		num_char_removidos + idx))
 	
 func scroll_to_line(line : int):
-	rich_text_label.scroll_to_line(line)
+	await check_view_boundaries_and_move(line)
 	
-func check_view_boundaries(line : int):
-	if line > (MAX_LINHAS_VISIVEIS + primeira_linha_visivel) \
-			or (line < primeira_linha_visivel):
+func check_view_boundaries_and_move(line : int):
+	if line > (MAX_LINHAS_VISIVEIS + primeira_linha_visivel):
+		await get_tree().create_tween().tween_method(
+			rich_text_label.scroll_to_line, primeira_linha_visivel, line,
+			ANIM_ROLAR_LINHAS_DURACAO).finished
+		primeira_linha_visivel = line - MAX_LINHAS_VISIVEIS
+		
+	elif (line < primeira_linha_visivel):
 		await get_tree().create_tween().tween_method(
 			rich_text_label.scroll_to_line, primeira_linha_visivel, line,
 			ANIM_ROLAR_LINHAS_DURACAO).finished

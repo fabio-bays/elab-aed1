@@ -243,6 +243,8 @@ libraries = {
 speed_scale = 0.5
 
 [node name="Ponteiro" parent="." instance=ExtResource("3_asyfw")]
+frame = 7
+frame_progress = 0.377796
 
 [connection signal="input_event" from="Esfera/Area2D" to="." method="_on_area_2d_input_event"]
 [connection signal="mouse_entered" from="Esfera/Area2D" to="." method="_on_area_2d_mouse_entered"]

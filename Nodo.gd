@@ -7,6 +7,7 @@ var remover_toggled_on : bool = false
 signal nodo_clicado(nodo_id, acao : int)
 signal nodo_mouse_pairando(nodo_id, esta_pairando)
 var timer
+
 func _ready():
 	$Esfera.play()
 	$Ponteiro.play()
@@ -27,9 +28,6 @@ func _on_remover_toggled():
 		remover_toggled_on = true
 	else:
 		remover_toggled_on = false
-
-
-
 
 func _on_area_2d_mouse_entered():
 	$Esfera/Area2D.connect('mouse_exited', _on_area_2d_mouse_exited)
@@ -69,3 +67,8 @@ func esfera_stop_anim():
 			$Esfera/AnimationPlayer.seek, 
 			$Esfera/AnimationPlayer.get_current_animation_position(), 0, 1).finished
 	$Esfera/AnimationPlayer.stop()
+
+func anim_set_scale(new_scale : Vector2, anim_duracao : float):
+	await get_tree().create_tween().tween_property(
+		self, 'scale', new_scale, anim_duracao
+	).finished 

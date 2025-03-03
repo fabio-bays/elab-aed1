@@ -265,6 +265,7 @@ _data = {
 
 [node name="Ponteiro" type="AnimatedSprite2D"]
 texture_filter = 1
+position = Vector2(32, 24)
 scale = Vector2(1.5, 1.5)
 sprite_frames = SubResource("SpriteFrames_adk0h")
 animation = &"idle"

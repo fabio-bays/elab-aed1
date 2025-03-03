@@ -3,11 +3,16 @@ extends Node
 @export var nodo_scene : PackedScene
 @export var bloco_codigo_scene : PackedScene
 @export var ponteiro_scene : PackedScene
+@export var parallax_bg_scene : PackedScene
+
+@export var parallax_bg : Node2D
+@export var ponteiro : AnimatedSprite2D
+
 
 const VIEWPORT_SIZE = Vector2(320, 180)
 const GRID_SIZE = Vector2(8, 8)
 const NUMBER_OF_GRIDS = Vector2(VIEWPORT_SIZE / GRID_SIZE)
-const NODO_COMP_X = 11 * GRID_SIZE.x
+const NODO_COMP_X = 4 * GRID_SIZE.x
 const DISPLAY_STRS : PackedStringArray = [
 	'Nodo* inserir_pos_itr(Nodo *lista, int pos, int x)
 	{
@@ -86,14 +91,14 @@ const DISPLAY_STRS : PackedStringArray = [
 	}'
 ] # 0: inserir iterativamente. 1: remover iterativamente. 2: inserir recursivamente
 	#+ 3: remover recursivamente
-const cores_retangulos = ['7f0622', '00563d', '430067', '002859']
+const CORES_RETANGULOS = ['7f0622', '00563d', '430067', '002859']
 # Vermelho, rosa, roxo, azul.
+const COR_FUNDO_DEFAULT = '121116'
 const POS_CANTO_TELA = Vector2(GRID_SIZE.x * 16, -GRID_SIZE.y * 8)
 const DISTAN_PTR_NODO = Vector2(GRID_SIZE.x * 4, 0)
 
-const ANIM_INTERVALO_DURACAO : float = .1 # em segundos
-const ANIM_ANIMACAO_DURACAO : float = 1
-
+const ANIM_INTERVALO_DURACAO : float = 1 # em segundos
+const ANIM_ANIMACAO_DURACAO : float = .5
 var camera_direction = Vector2(0,0)
 var modo_animacao_iterativa #-> o jogo começa com qual modo ativado?
 var lista
@@ -102,18 +107,28 @@ signal inserir_toggled
 signal remover_toggled
 
 class Utilidades:
-	static func set_rec_retan(rec_retan, lista, pilha_cor, fila_cor):
-		var rec_retan_pos = instance_from_id(lista.get_primeiro_nodo_id()).position \
-			- GRID_SIZE * 6
-		var rec_retan_cor = fila_cor.pop_front()
+	static var rec_cor_anterior : Color = COR_FUNDO_DEFAULT
+	static func rec_set_rect(rec_rect, rec_rect_pos, cor):
 		
-		pilha_cor.push_front(rec_retan_cor)
-		fila_cor.push_back(rec_retan_cor)
-		rec_retan_pos.y = - GRID_SIZE.y * 12
-		rec_retan.position = rec_retan_pos
-		rec_retan.size = Vector2(336, 192)
-		rec_retan.color = rec_retan_cor
+		rec_rect_pos.y = - GRID_SIZE.y * 12
+		rec_rect.position = rec_rect_pos
+		rec_rect.size = Vector2(336, 192)
+		rec_rect.color = Color(cor)
 
+	static func rec_get_cor_entrando(pilha_cor, fila_cor):
+		var cor = fila_cor.pop_front()
+		
+		pilha_cor.push_back(rec_cor_anterior)
+		rec_cor_anterior = cor
+		fila_cor.push_back(cor)
+		
+		return cor
+		
+	static func rec_get_cor_saindo(pilha_cor, fila_cor):
+		var cor = pilha_cor.pop_back()
+		rec_cor_anterior = cor
+		return cor
+		
 class Lista:
 	var lista : Dictionary
 	var nulo_id : int
@@ -178,9 +193,20 @@ class Lista:
 			self.primeiro_nodo_da_lista_id = nodo_novo_id
 			self.ultimo_nodo_da_lista_id = nodo_novo_id
 
-	func pop_nodo_id(nodo_id):
+	func get_primeiro_nodo_id_pre_insercao():
+		## Obter o id do antigo primeiro nodo. Como a animação de inserção é feita
+		## após a inserção do objeto em "lista", o primeiro nodo para a animação
+		## é posterior ao objeto inserido.
+		var primeiro_nodo_id = self.get_primeiro_nodo_id()
+		if primeiro_nodo_id == self.get_ultimo_nodo_inserido_id():
+			primeiro_nodo_id = self.get_nodo_posterior_id(primeiro_nodo_id)
+		if primeiro_nodo_id == null:
+			primeiro_nodo_id = self.get_nulo_id()
+
+		return primeiro_nodo_id
+
+	func erase_nodo_id(nodo_id):
 		if nodo_id != nulo_id:
-			print('aqui em ! ')
 			var nodo_anterior_id = self.lista[nodo_id]['ant']
 			var nodo_posterior_id = self.lista[nodo_id]['pos']
 			
@@ -193,8 +219,6 @@ class Lista:
 			if nodo_id == self.primeiro_nodo_da_lista_id:
 				self.primeiro_nodo_da_lista_id = self._checar_se_null(nodo_posterior_id)
 			self.lista.erase(nodo_id)
-		
-		return nodo_id
 		
 	func get_nodo_posterior_id(nodo_atual_id : int):
 		return self.lista[nodo_atual_id]['pos']
@@ -213,18 +237,18 @@ class Lista:
 		lista_copia.ultimo_nodo_da_lista_id = self.ultimo_nodo_da_lista_id
 		lista_copia.nulo_id = self.nulo_id
 		
-		print(self.nulo_id, ' ', lista_copia.nulo_id)
-		
 		return lista_copia
+
+	func get_elementos_id():
+		return lista.keys()
 		
 func _ready():
-	$Ponteiro.set_label_text('Lista')
+	ponteiro.set_label_text('Lista')
 	$Nulo.add_user_signal('nulo_clicado', [null, 'acao'])
 	$Nulo.connect('nulo_clicado', _on_nodo_ou_nulo_clicado)
 	anim_o_comeco()
 	lista = Lista.new()
 	lista.set_nulo_id($Nulo.get_instance_id())
-	print(lista.get_primeiro_nodo_id() == $Nulo.get_instance_id())
 
 func _process(delta):
 	if lista.lista.is_empty(): 
@@ -358,16 +382,20 @@ func display_bloco_codigo():
 	if $Camera2D/Botoes/Inserir.button_pressed:
 		if modo_animacao_iterativa:
 			bloco_codigo.display_str = DISPLAY_STRS[0]
+		else:
+			bloco_codigo.display_str = DISPLAY_STRS[2]
 	elif $Camera2D/Botoes/Remover.button_pressed:
 		if modo_animacao_iterativa:
 			bloco_codigo.display_str = DISPLAY_STRS[1]
-			
+		else:
+			bloco_codigo.display_str = DISPLAY_STRS[3]
+
 	$Camera2D.add_child(bloco_codigo)
 	return bloco_codigo
 	
 func remover_bloco_codigo(bloco_codigo):
 	$Camera2D.remove_child(bloco_codigo)
-	bloco_codigo.free()
+	bloco_codigo.queue_free()
 
 func set_visibilidade_botoes(visibilidade : bool):
 	var remover_button = $Camera2D/Botoes/Remover
@@ -380,33 +408,48 @@ func anim_o_comeco():
 	var scene_tween = get_tree().create_tween().set_trans(Tween.TRANS_EXPO)
 	scene_tween.tween_property($Nulo, "scale", Vector2(1.5,1.5), 1).from(Vector2(0,0))
 	$Nulo.play()
-	$Ponteiro.play()
-	scene_tween.tween_property($Ponteiro, "visible", true, 1e-9).from(false)
-	scene_tween.tween_property($Ponteiro, "scale", Vector2(1.5, 1.5), 0.5).from(
+	ponteiro.play()
+	scene_tween.tween_property(ponteiro, "visible", true, 1e-9).from(false)
+	scene_tween.tween_property(ponteiro, "scale", Vector2(1.5, 1.5), 0.5).from(
 		Vector2(0.2,0.2))
+
+func anim_nodo_novo(nodo, bloco_codigo):
+	
+	anim_bloco_codigo_highlight_str(
+		bloco_codigo, ['Nodo *novo = malloc(sizeof(Nodo));', 1]
+	)
+	await get_tree().create_tween().set_parallel().tween_property(
+		nodo, 'visible', true, 1e-9
+	)
+	await get_tree().create_tween().tween_property(
+	nodo, "scale", Vector2(1, 1), ANIM_ANIMACAO_DURACAO / 2).from(Vector2(0.3,0.3)).finished
+
+	await anim_intervalo(ANIM_INTERVALO_DURACAO * 2)
+
+	await anim_bloco_codigo_highlight_str(bloco_codigo, 
+		['novo->info = x;', 1])
+
+	await nodo.anim_info_esmaecer().animation_finished	#padronizar? -> ao invés de chamar
+														#+ um método da cena, extrair o objeto
+														#+ da cena e aplicar o tweener?
+
+	await anim_intervalo(ANIM_INTERVALO_DURACAO)
 	
 func anim_inserir_itr_nodo_novo(nodo, bloco_codigo):
-		anim_bloco_codigo_highlight_str(bloco_codigo, 
-										['Nodo *novo = malloc(sizeof(Nodo));', 1])
-		
-		await get_tree().create_tween().tween_property(
-		nodo, "scale", Vector2(1, 1), ANIM_ANIMACAO_DURACAO / 2).from(Vector2(0.3,0.3)).finished
-		
-		await anim_intervalo(ANIM_INTERVALO_DURACAO * 2)
-		
-		await anim_bloco_codigo_highlight_str(bloco_codigo, 
-			['novo->info = x;', 1])
-		
-		await nodo.anim_info_esmaecer().animation_finished	#padronizar? -> ao invés de chamar
-															#+ um método da cena, extrair o objeto
-															#+ da cena e aplicar o tweener?
-		
-		await anim_intervalo(ANIM_INTERVALO_DURACAO)
-		
+		await anim_nodo_novo(nodo, bloco_codigo)
 		await anim_bloco_codigo_highlight_str(bloco_codigo, 
 											['if(lista == NULL || pos == 0)', 1])
+
+func anim_inserir_rec_nodo_novo(nodo, bloco_codigo):
+	anim_bloco_codigo_highlight_str(bloco_codigo, ['if(pos == 0)', 1])
+	await anim_nodo_novo(nodo, bloco_codigo)
+	await get_tree().create_tween().tween_property(
+		$Camera2D, 'position', 
+		$Camera2D.position - Vector2(2 * NODO_COMP_X, 0), ANIM_ANIMACAO_DURACAO
+		).finished
 	
-func anim_inserir_itr_no_inicio(nodo, bloco_codigo, apontar_para_id): 
+func anim_inserir_no_inicio(nodo, bloco_codigo, apontar_para_id, 
+								ponteiro_cabeca): 
 	var apontar_para = instance_from_id(apontar_para_id)
 	var nodo_ponteiro = nodo.get_ponteiro_scene()
 	await anim_intervalo(ANIM_INTERVALO_DURACAO)
@@ -427,7 +470,7 @@ func anim_inserir_itr_no_inicio(nodo, bloco_codigo, apontar_para_id):
 	bloco_codigo.highlight_str('lista = novo;')
 	await anim_intervalo(ANIM_INTERVALO_DURACAO)
 	await get_tree().create_tween().tween_property(
-		$Ponteiro, "position", nodo.position - Vector2(
+		ponteiro_cabeca, "position", nodo.position - Vector2(
 			GRID_SIZE.x * 4, 0), ANIM_ANIMACAO_DURACAO).finished
 	
 	## Animação: comportar na corrente o nodo, seu ponteiro, e o ponteiro na horizontal
@@ -439,8 +482,9 @@ func anim_inserir_itr_no_inicio(nodo, bloco_codigo, apontar_para_id):
 	move_tudo_tween.tween_property(nodo_ponteiro, "position", 
 								Vector2(GRID_SIZE.x * 4, 0), ANIM_ANIMACAO_DURACAO)
 
-	move_tudo_tween.tween_property($Ponteiro, "global_position", apontar_para.position
-								- Vector2(GRID_SIZE.x * 12, 0), ANIM_ANIMACAO_DURACAO)
+	await move_tudo_tween.tween_property(
+		ponteiro_cabeca, "global_position", apontar_para.position
+		- Vector2(GRID_SIZE.x * 12, 0), ANIM_ANIMACAO_DURACAO).finished
 
 func anim_inserir_itr_no_meio(nodo_novo, bloco_codigo, nodo_clicado_id, nodo_anterior_id):
 	await anim_bloco_codigo_highlight_str(bloco_codigo, ['else', 1])
@@ -496,37 +540,136 @@ func anim_insercao_nodo(nodo_clicado_id = null):
 	var nodo_novo = instance_from_id(lista.get_ultimo_nodo_inserido_id()) 
 	var bloco_codigo = display_bloco_codigo()
 		
-	anim_set_novo_nodo_pos(nodo_novo)
-	add_child(nodo_novo)
 	if modo_animacao_iterativa:
+		anim_set_novo_nodo_pos(nodo_novo)
+		nodo_novo.visible = false
+		add_child(nodo_novo)
 		await anim_inserir_itr_nodo_novo(nodo_novo, bloco_codigo)
 		
 		if nodo_clicado_id == null:
-			await anim_inserir_itr_no_inicio(nodo_novo, bloco_codigo, lista.get_nulo_id())
+			await anim_inserir_no_inicio(nodo_novo, bloco_codigo, lista.get_nulo_id(), ponteiro)
 		else:
 			var nodo_anterior_id = lista.get_nodo_anterior_id_anim(nodo_clicado_id)
 		
 			if nodo_anterior_id == null:
-				await anim_inserir_itr_no_inicio(nodo_novo, bloco_codigo, nodo_clicado_id)
+				await anim_inserir_no_inicio(nodo_novo, bloco_codigo, nodo_clicado_id, ponteiro)
 			else:
-				var resultado = await anim_inserir_itr_no_meio(nodo_novo, bloco_codigo, nodo_clicado_id, 
-												nodo_anterior_id)
+				var resultado = await anim_inserir_itr_no_meio(
+					nodo_novo, bloco_codigo, nodo_clicado_id, nodo_anterior_id
+				)
 				
 				var ponteiro_aux = resultado[0]
 				var ponteiro_anterior = resultado[1]
 				await anim_itr_return(ponteiro_aux, ponteiro_anterior)
-		nodo_novo.esfera_stop_anim()
-		remover_bloco_codigo(bloco_codigo)
+
+		await nodo_novo.esfera_stop_anim()
 		
 		for node in get_tree().get_nodes_in_group('nodos_anteriores_ao_clicado'):
 			node.remove_from_group('nodos_anteriores_ao_clicado')
 	else:
 		var pilha_cor : Array = []
-		var fila_cor : Array = cores_retangulos.duplicate()
-		var lista_copia = lista.duplicate()
-		var resultado = await anim_rec_inicio(pilha_cor, fila_cor, bloco_codigo,
-												lista_copia)
+		var fila_cor : Array = CORES_RETANGULOS.duplicate()
+		var ptr_lista_copia = ponteiro_scene.instantiate()
+		var rec_rect = ColorRect.new()
+		rec_rect.visible = false
+		add_child(rec_rect)
+		move_child(rec_rect, 0)
 		
+		nodo_novo.visible = false
+		add_child(nodo_novo)
+		
+		await anim_cam_focar_objeto(instance_from_id(
+			lista.get_primeiro_nodo_id_pre_insercao()))
+			
+		if nodo_clicado_id == null:
+			## Animação: rec, inserir no início
+			anim_set_novo_nodo_pos(nodo_novo)
+			await anim_rec_inicio(pilha_cor, fila_cor, bloco_codigo,
+								ponteiro, rec_rect, ptr_lista_copia)
+			await anim_inserir_rec_nodo_novo(nodo_novo, bloco_codigo)
+			await anim_inserir_no_inicio(
+				nodo_novo, bloco_codigo, lista.get_nulo_id(), ptr_lista_copia
+			)
+			await anim_intervalo(ANIM_INTERVALO_DURACAO)
+			await nodo_novo.esfera_stop_anim()
+			await anim_rec_return(
+				rec_rect, ptr_lista_copia, fila_cor, pilha_cor, bloco_codigo,
+				ponteiro
+			)
+		else:
+			var nodo_anterior_ao_clic_id = lista.get_nodo_anterior_id_anim(nodo_clicado_id)
+			if nodo_anterior_ao_clic_id == null:
+				## Animação: rec, inserir no início
+				anim_set_novo_nodo_pos(nodo_novo)
+				await anim_rec_inicio(pilha_cor, fila_cor, bloco_codigo,
+									ponteiro, rec_rect, ptr_lista_copia)
+				await anim_inserir_rec_nodo_novo(nodo_novo, bloco_codigo)
+				await anim_inserir_no_inicio(nodo_novo, bloco_codigo, nodo_clicado_id, ptr_lista_copia)
+				await anim_intervalo(ANIM_INTERVALO_DURACAO)
+				await nodo_novo.esfera_stop_anim()
+				await anim_rec_return(
+					rec_rect, ptr_lista_copia, fila_cor, pilha_cor, bloco_codigo,
+					ponteiro
+				)
+			else:
+				var nodo_anterior_ao_clic = instance_from_id(
+					nodo_anterior_ao_clic_id
+				)
+				var nodo_anterior_id
+				var nodo_anterior
+				var nodo_atual_id = lista.get_primeiro_nodo_id()
+				var ultimo_nodo_inserido_id = lista.get_ultimo_nodo_inserido_id()
+				# O último nodo inserido na estrutura lista, antes da animação
+				# ocorrer, é sempre anterior ao nodo clicado na lista visual.
+				while nodo_atual_id != ultimo_nodo_inserido_id:
+					nodo_anterior_id = lista.get_nodo_anterior_id(nodo_atual_id)
+					if nodo_anterior_id == null:
+						await anim_rec_inicio(pilha_cor, fila_cor, bloco_codigo,
+											ponteiro, rec_rect, 
+											ptr_lista_copia)
+					else:
+						nodo_anterior = instance_from_id(nodo_anterior_id)
+						await get_tree().create_tween().tween_property(
+							ptr_lista_copia, 'position', 
+							ptr_lista_copia.position - DISTAN_PTR_NODO, 
+							ANIM_ANIMACAO_DURACAO
+						).set_trans(Tween.TRANS_CUBIC).finished
+						await anim_rec_inicio(pilha_cor, fila_cor, bloco_codigo,
+											nodo_anterior, rec_rect, 
+											ptr_lista_copia)
+					nodo_atual_id = lista.get_nodo_posterior_id(nodo_atual_id)
+				
+				await get_tree().create_tween().tween_property(
+					ptr_lista_copia, 'position', 
+					ptr_lista_copia.position - DISTAN_PTR_NODO, 
+					ANIM_ANIMACAO_DURACAO).set_trans(Tween.TRANS_CUBIC).finished
+				await anim_rec_inicio(pilha_cor, fila_cor, bloco_codigo,
+										nodo_anterior_ao_clic, rec_rect, 
+										ptr_lista_copia)
+
+				anim_set_novo_nodo_pos(nodo_novo)
+				await anim_inserir_rec_nodo_novo(nodo_novo, bloco_codigo)
+				await anim_inserir_no_inicio(nodo_novo, bloco_codigo, 
+											nodo_clicado_id, ptr_lista_copia)
+				await anim_intervalo(ANIM_INTERVALO_DURACAO)
+				await nodo_novo.esfera_stop_anim()
+	
+				nodo_anterior_id = lista.get_nodo_anterior_id(ultimo_nodo_inserido_id)
+				while nodo_anterior_id != null:
+					nodo_anterior = instance_from_id(nodo_anterior_id)
+					await anim_rec_return(
+						rec_rect, ptr_lista_copia, fila_cor, pilha_cor, bloco_codigo,
+						nodo_anterior
+					)
+					nodo_anterior_id = lista.get_nodo_anterior_id(nodo_anterior_id)
+				
+				await anim_rec_return(
+					rec_rect, ptr_lista_copia, fila_cor, pilha_cor, bloco_codigo,
+					ponteiro
+				)
+
+	remover_bloco_codigo(bloco_codigo)
+	
 func anim_remocao_nodo(nodo_clicado_id):
 	var bloco_codigo = display_bloco_codigo()
 	var nodo_anterior_id = lista.get_nodo_anterior_id(nodo_clicado_id)
@@ -544,7 +687,7 @@ func anim_remocao_nodo(nodo_clicado_id):
 		
 	await anim_itr_return(ponteiro_aux, ponteiro_anterior)
 	
-	lista.pop_nodo_id(nodo_clicado_id)
+	lista.erase_nodo_id(nodo_clicado_id)
 	remover_bloco_codigo(bloco_codigo)
 	
 	for nodes in get_tree().get_nodes_in_group('nodos_anteriores_ao_clicado'):
@@ -560,7 +703,7 @@ func anim_remover_itr_primeira_pos(bloco_codigo, nodo_clicado_id):
 	else:
 		nodo_posterior = $Nulo
 	
-	await anim_itr_cam_focar_objeto(instance_from_id(lista.get_primeiro_nodo_id()))
+	await anim_cam_focar_objeto(instance_from_id(lista.get_primeiro_nodo_id()))
 	
 	await anim_bloco_codigo_highlight_str(bloco_codigo, 
 										['Nodo *aux = lista;', 1])
@@ -581,7 +724,7 @@ func anim_remover_itr_primeira_pos(bloco_codigo, nodo_clicado_id):
 	await anim_bloco_codigo_highlight_str(bloco_codigo, 
 										['lista = lista->prox;', 1])
 	
-	await anim_ptr_apontar($Ponteiro, 
+	await anim_ptr_apontar(ponteiro, 
 							nodo_posterior.position + Vector2(0, -GRID_SIZE.y * 4), 90)
 
 	await anim_intervalo(ANIM_INTERVALO_DURACAO)
@@ -600,7 +743,7 @@ func anim_remover_itr_primeira_pos(bloco_codigo, nodo_clicado_id):
 
 	await anim_intervalo(ANIM_INTERVALO_DURACAO)
 	
-	await anim_ptr_apontar($Ponteiro,
+	await anim_ptr_apontar(ponteiro,
 						 nodo_posterior.position + Vector2(
 							-GRID_SIZE.x * 4, 0), 0)
 
@@ -743,7 +886,7 @@ func anim_itr_num_pos_nodos_rev(nodo_clicado_id, nodo_novo = null):
 		new_label.visible = true
 		i += 1
 
-func anim_itr_cam_focar_objeto(objeto):
+func anim_cam_focar_objeto(objeto):
 	## Mover a câmera de supetão para trás e fazê-la focar no primeiro nodo
 	##+ da lista.
 	var transicao_tween = get_tree().create_tween().	\
@@ -754,12 +897,13 @@ func anim_itr_cam_focar_objeto(objeto):
 	await transicao_tween.tween_property($Camera2D, "zoom", Vector2(1, 1), 
 										ANIM_ANIMACAO_DURACAO).finished
 
-func anim_ptr_surgir(ponteiro, posicao : Vector2, label : String):
-	ponteiro.position = posicao
-	ponteiro.scale = Vector2(0.2, 0.2)
-	ponteiro.set_label_text(label)
-	add_child(ponteiro)
-	await get_tree().create_tween().tween_property(ponteiro, "scale",
+func anim_ptr_surgir(o_ponteiro, posicao : Vector2, label : String):
+	o_ponteiro.position = posicao
+	o_ponteiro.scale = Vector2(0.2, 0.2)
+	o_ponteiro.set_label_text(label)
+	if !o_ponteiro.is_inside_tree():
+		add_child(o_ponteiro)
+	await get_tree().create_tween().tween_property(o_ponteiro, "scale",
 													Vector2(1.5, 1.5), 
 													ANIM_ANIMACAO_DURACAO / 2). \
 													finished
@@ -813,8 +957,8 @@ func anim_itr_mover_anteriores(nodo_anterior_id, ponteiro_anterior, sentido : St
 	elif sentido == 'dir':
 		sentido_sinal = +1
 	get_tree().create_tween().tween_property(
-		$Ponteiro, 'position', 
-		$Ponteiro.position + sentido_sinal 
+		ponteiro, 'position', 
+		ponteiro.position + sentido_sinal 
 		* Vector2(GRID_SIZE.x * 8, 0), ANIM_ANIMACAO_DURACAO)
 	get_tree().create_tween().set_parallel().tween_property(
 		ponteiro_anterior, 'position', 
@@ -881,7 +1025,7 @@ func anim_itr_no_meio_pos_dif_zero(nodo_clicado_id, bloco_codigo,
 									ponteiro_anterior, insercao : bool, 
 									ponteiro_aux = null, nodo_novo = null):
 	anim_itr_num_pos_nodos_rev(nodo_clicado_id, nodo_novo)
-	await anim_itr_cam_focar_objeto(instance_from_id(lista.get_primeiro_nodo_id()))
+	await anim_cam_focar_objeto(instance_from_id(lista.get_primeiro_nodo_id()))
 
 	if insercao:
 		## Animação: nodo novo indo para a esquerda da tela
@@ -1053,11 +1197,116 @@ func anim_itr_no_meio_preparar_aux_e_anterior(rect_nodo, rect_nodo_centralizado,
 func anim_itr_return(ponteiro_aux, ponteiro_anterior):
 	if ponteiro_aux:
 		await anim_esmaecer(ponteiro_aux)
-		ponteiro_aux.free()
+		ponteiro_aux.queue_free()
 	if ponteiro_anterior:
 		await anim_esmaecer(ponteiro_anterior)
-		ponteiro_anterior.free()
+		ponteiro_anterior.queue_free()
+
+func anim_rec_return(rec_retan, ptr_lista_copia, fila_cor, pilha_cor, bloco_codigo,
+					obj_chamada_anterior):
+	rec_retan.color.a8 = 255
+	rec_retan.visible = true
+	var cor_chamada_anterior = Utilidades.rec_get_cor_saindo(pilha_cor, fila_cor)
+	var cor_retorno = rec_retan.color
+	var ptr_chamada_anterior
+	var fator_distancia : int
+	var rect_pos : Vector2
+	
+	if obj_chamada_anterior == ponteiro:
+		ptr_chamada_anterior = ponteiro
+		rect_pos = obj_chamada_anterior.position - 2 * GRID_SIZE
+		fator_distancia = 1
+	else:
+		ptr_chamada_anterior = obj_chamada_anterior.get_ponteiro_scene()
+		rect_pos = obj_chamada_anterior.position + DISTAN_PTR_NODO - 2 * GRID_SIZE
+		fator_distancia = 2
+
+	await anim_bloco_codigo_highlight_str(bloco_codigo, 
+										['return lista;', 2])
+	await anim_intervalo(ANIM_INTERVALO_DURACAO)
+	
+	await get_tree().create_tween().tween_property(
+		rec_retan, 'color:a8', 0, ANIM_ANIMACAO_DURACAO
+	).finished
+	rec_retan.visible = false
+	
+	get_tree().create_tween().set_parallel().tween_method(
+		parallax_bg.set_cor, parallax_bg.get_cor(), 
+		Color(cor_chamada_anterior), ANIM_ANIMACAO_DURACAO
+	)
+	
+	get_tree().create_tween().tween_property(
+		ptr_lista_copia, 'self_modulate', cor_retorno, ANIM_ANIMACAO_DURACAO
+	).finished
+	
+	await get_tree().create_tween().tween_property(
+		ptr_lista_copia, 'scale', Vector2(2, 2), ANIM_ANIMACAO_DURACAO
+	).from_current().set_trans(Tween.TRANS_EXPO).set_ease(Tween.EASE_OUT).finished
+	
+	await get_tree().create_tween().set_parallel(false).tween_property(
+		ptr_lista_copia, 'scale', Vector2(1.5, 1.5), ANIM_ANIMACAO_DURACAO/4
+	).from_current().set_trans(Tween.TRANS_EXPO).set_ease(
+		Tween.EASE_OUT).finished
+	
+	await get_tree().create_tween().tween_property(
+		$Camera2D, 'position:x', $Camera2D.position.x - NODO_COMP_X, 
+		ANIM_ANIMACAO_DURACAO
+	).finished
+	
+	if obj_chamada_anterior != ponteiro:
+		bloco_codigo.scroll_to_line(0)
+		await anim_bloco_codigo_highlight_str(bloco_codigo, 
+											['lista->prox = inserir_pos_rec(lista->prox, pos - 1, x);', 1])
+		await anim_intervalo(2 * ANIM_INTERVALO_DURACAO)
+	
+	obj_chamada_anterior.position.x = ptr_lista_copia.position.x -  \
+		fator_distancia*NODO_COMP_X
+	get_tree().create_tween().set_parallel(true).tween_property(
+		obj_chamada_anterior, 'visible', true, 1e-9)
+	await get_tree().create_tween().tween_property(
+		ptr_chamada_anterior, 'self_modulate', 
+		Color(1, 1, 1, 1), ANIM_ANIMACAO_DURACAO).from(Color(1,1,1,0)).finished
 		
+	get_tree().create_tween().set_parallel().tween_property(
+		ptr_chamada_anterior, 'scale', Vector2(2, 2), ANIM_ANIMACAO_DURACAO
+	).from_current().set_trans(Tween.TRANS_EXPO).set_ease(Tween.EASE_OUT)
+	
+	get_tree().create_tween().tween_property(
+		ptr_chamada_anterior, 'self_modulate', cor_retorno, ANIM_ANIMACAO_DURACAO
+	)
+	
+	await get_tree().create_tween().tween_property(
+		ptr_lista_copia, 'self_modulate', Color(1,1,1,1), ANIM_ANIMACAO_DURACAO
+	).finished
+	
+	await get_tree().create_tween().tween_property(
+		ptr_chamada_anterior, 'scale', Vector2(1.5, 1.5), ANIM_ANIMACAO_DURACAO/4
+	).from_current().set_trans(Tween.TRANS_EXPO).set_ease(
+		Tween.EASE_OUT).finished
+	
+	await anim_esmaecer(ptr_lista_copia)
+	
+	await get_tree().create_tween().tween_property(
+		obj_chamada_anterior, 'position:x', 
+		ptr_lista_copia.position.x - (fator_distancia - 1)*NODO_COMP_X,
+		ANIM_ANIMACAO_DURACAO
+	).set_trans(Tween.TRANS_EXPO).set_ease(Tween.EASE_OUT).finished
+	
+	await get_tree().create_tween().tween_property(
+		ptr_chamada_anterior, 'self_modulate', Color(1,1,1,1), ANIM_ANIMACAO_DURACAO
+	).finished
+	
+	Utilidades.rec_set_rect(rec_retan, rect_pos, cor_chamada_anterior)
+	
+	if obj_chamada_anterior != ponteiro:
+		ptr_lista_copia.position.x = obj_chamada_anterior.position.x - NODO_COMP_X
+		ptr_lista_copia.set_modulate(Color(1,1,1,1))
+		await get_tree().create_tween().tween_property(
+			$Camera2D, 'position:x', $Camera2D.position.x - NODO_COMP_X, 
+			ANIM_ANIMACAO_DURACAO).finished
+
+
+	
 func anim_nodo_ascender(nodo_clicado):
 	await get_tree().create_tween().tween_property(
 	nodo_clicado, 'position', 
@@ -1069,44 +1318,49 @@ func anim_set_novo_nodo_pos(nodo_novo):
 	nodo_novo.position.y -= VIEWPORT_SIZE.y / 2 / 1.3
 
 func anim_rec_inicio(pilha_cor : Array, fila_cor : Array, bloco_codigo,
-					lista_copia):
-	var ptr_lista_copia = ponteiro_scene.instantiate()
-	var rec_retan = ColorRect.new()
-	Utilidades.set_rec_retan(rec_retan, lista, pilha_cor, fila_cor)
-
+					obj_anterior, rec_rect, ptr_lista_copia):
+	var rect_cor = Utilidades.rec_get_cor_entrando(pilha_cor, fila_cor)
+	var rect_pos
+	var ptr_copia_pos 
+	if obj_anterior == ponteiro:
+		rect_pos = obj_anterior.position - 2 * GRID_SIZE
+		ptr_copia_pos = obj_anterior.position
+	else:
+		rect_pos = obj_anterior.position + DISTAN_PTR_NODO - 2 * GRID_SIZE
+		ptr_copia_pos = obj_anterior.position + DISTAN_PTR_NODO
+		
+	Utilidades.rec_set_rect(rec_rect, rect_pos , rect_cor)
+	
+	await anim_intervalo(ANIM_INTERVALO_DURACAO)
 	await get_tree().create_tween().tween_property(
-		$Ponteiro, 'position', $Ponteiro.position -  DISTAN_PTR_NODO,
+		obj_anterior, 'position', obj_anterior.position -  DISTAN_PTR_NODO,
 		ANIM_ANIMACAO_DURACAO).set_trans(Tween.TRANS_CUBIC).finished
 	await anim_intervalo(ANIM_INTERVALO_DURACAO)
 	
-	await anim_ptr_surgir(ptr_lista_copia, $Ponteiro.position + DISTAN_PTR_NODO,
+	await anim_ptr_surgir(ptr_lista_copia, ptr_copia_pos,
 							'lista')
 	await anim_intervalo(ANIM_INTERVALO_DURACAO)
 	
-	rec_retan.color.a8 = 70
+	rec_rect.visible = true
+	rec_rect.color.a8 = 70
 	await anim_intervalo(ANIM_INTERVALO_DURACAO)
-	rec_retan.color.a8 = 0
-	add_child(rec_retan)
-	move_child(rec_retan, 0)
+	rec_rect.color.a8 = 0
+
 	await get_tree().create_tween().tween_property(
-		rec_retan, 'color:a8', 255, ANIM_ANIMACAO_DURACAO
+		rec_rect, 'color:a8', 255, ANIM_ANIMACAO_DURACAO
 	).set_trans(Tween.TRANS_CUBIC).finished
 	
-	var rec_primeiro_nodo_id = lista_copia.get_primeiro_nodo_id()
-	# Como a lista é atualizada antes da animação,
-	if rec_primeiro_nodo_id == lista_copia.get_ultimo_nodo_inserido_id():
-		rec_primeiro_nodo_id = lista_copia.get_nodo_posterior_id(rec_primeiro_nodo_id)
-		if rec_primeiro_nodo_id == null:
-			rec_primeiro_nodo_id = lista_copia.get_nulo_id()
-	lista_copia.pop_nodo_id(rec_primeiro_nodo_id)
+	await anim_rec_mover_cam(rec_rect, ptr_lista_copia, 1)
 	
-	print_tree_pretty()
-	await anim_rec_mover_cam(rec_retan)
+	parallax_bg.set_cor(rect_cor)
+	obj_anterior.visible = false
+	rec_rect.visible = false
+	rec_rect.color.a8 = 0
 	
-func anim_rec_mover_cam(rect):
+func anim_rec_mover_cam(rect, ptr_lista_copia, sentido : int):
 	await get_tree().create_tween().tween_property(
 		$Camera2D, 'position:x', 
-		(rect.position.x + rect.size.x/2) - 8, ANIM_ANIMACAO_DURACAO
+		(rect.position.x + sentido * rect.get_size().x/2) - 8, ANIM_ANIMACAO_DURACAO
 	).set_trans(Tween.TRANS_EXPO).set_ease(Tween.EASE_IN_OUT).finished
 
-	
+
