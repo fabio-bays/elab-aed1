@@ -348,6 +348,35 @@ theme_override_font_sizes/font_size = 5
 toggle_mode = true
 text = "Recursivo"
 
+[node name="Acelerar" type="Button" parent="Camera2D/Botoes"]
+visible = false
+offset_left = 128.0
+offset_top = 56.0
+offset_right = 152.0
+offset_bottom = 81.0
+theme_override_fonts/font = ExtResource("3_op5oh")
+text = ">>"
+
+[node name="Desacelerar" type="Button" parent="Camera2D/Botoes"]
+visible = false
+offset_left = 64.0
+offset_top = 56.0
+offset_right = 88.0
+offset_bottom = 81.0
+theme_override_fonts/font = ExtResource("3_op5oh")
+text = "<<"
+
+[node name="Pausar" type="Button" parent="Camera2D/Botoes"]
+process_mode = 3
+visible = false
+offset_left = 96.0
+offset_top = 56.0
+offset_right = 120.0
+offset_bottom = 81.0
+theme_override_fonts/font = ExtResource("3_op5oh")
+toggle_mode = true
+text = "||"
+
 [node name="Nulo" type="AnimatedSprite2D" parent="."]
 texture_filter = 1
 scale = Vector2(1.5, 1.5)
@@ -402,10 +431,14 @@ text = "0"
 horizontal_alignment = 1
 
 [node name="ParallaxBg" parent="." instance=ExtResource("8_jcx3j")]
+metadata/_edit_lock_ = true
 
 [connection signal="pressed" from="Camera2D/Botoes/Inserir" to="." method="_on_inserir_pressed"]
 [connection signal="toggled" from="Camera2D/Botoes/Inserir" to="." method="_on_inserir_toggled"]
 [connection signal="toggled" from="Camera2D/Botoes/Remover" to="." method="_on_remover_toggled"]
 [connection signal="toggled" from="Camera2D/Botoes/Iterativo" to="." method="_on_iterativo_toggled"]
 [connection signal="toggled" from="Camera2D/Botoes/Recursivo" to="." method="_on_recursivo_toggled"]
+[connection signal="pressed" from="Camera2D/Botoes/Acelerar" to="." method="_on_acelerar_pressed"]
+[connection signal="pressed" from="Camera2D/Botoes/Desacelerar" to="." method="_on_desacelerar_pressed"]
+[connection signal="toggled" from="Camera2D/Botoes/Pausar" to="." method="_on_pausar_toggled"]
 [connection signal="input_event" from="Nulo/Area2D" to="." method="_on_nulo_area_2d_input_event"]

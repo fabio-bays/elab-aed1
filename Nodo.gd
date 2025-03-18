@@ -6,7 +6,11 @@ var remover_toggled_on : bool = false
 
 signal nodo_clicado(nodo_id, acao : int)
 signal nodo_mouse_pairando(nodo_id, esta_pairando)
+signal nodo_mudou_posicao(nodo_id, posicao)
+
 var timer
+var nodo_movendo : bool = false
+	
 
 func _ready():
 	$Esfera.play()
@@ -16,6 +20,15 @@ func _ready():
 	$Ponteiro/AnimationPlayer.play('ptr_rondar_nodo')
 	
 	pos_anterior = position
+
+func _process(delta):
+	if position != pos_anterior:
+		pos_anterior = position
+		nodo_movendo = true
+	else:
+		if nodo_movendo:
+			nodo_mudou_posicao.emit(get_instance_id(), position)
+			nodo_movendo = false
 	
 func _on_inserir_toggled():
 	if !inserir_toggled_on:

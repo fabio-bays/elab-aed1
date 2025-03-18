@@ -6,6 +6,7 @@
 [sub_resource type="Theme" id="Theme_2b1me"]
 
 [node name="Control" type="Control"]
+process_mode = 3
 layout_mode = 3
 anchors_preset = 0
 script = ExtResource("1_8feg0")
@@ -24,3 +25,4 @@ bbcode_enabled = true
 text = "
 
 "
+tab_size = 2

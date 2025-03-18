@@ -18,7 +18,7 @@ func set_line_numbers():
 	
 	var  i = 1
 	for line in split_str:
-		line = str(i) + '. ' + line + '\n'
+		line = str(i) + '.' + line + '\n'
 		split_str[i - 1] = line
 		display_str += split_str[i - 1]
 		i += 1
