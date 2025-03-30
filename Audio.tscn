@@ -1,0 +1,71 @@
+[gd_scene load_steps=11 format=3 uid="uid://bkb8gywoxw0g6"]
+
+[ext_resource type="Script" path="res://Audio.gd" id="1_sqjj1"]
+[ext_resource type="AudioStream" uid="uid://j0plutrjfxtc" path="res://assets/musica/Algoritmo.wav" id="2_n6vvl"]
+[ext_resource type="AudioStream" uid="uid://bj3i85nx3maxm" path="res://assets/musica/Idle2_.wav" id="2_ut1yn"]
+[ext_resource type="AudioStream" uid="uid://ci5xfll1d1rhu" path="res://assets/sfx/Ponteiro-receber_resultado_rec_ptr_Lis.wav" id="3_r2bmc"]
+[ext_resource type="AudioStream" uid="uid://dxecfjrc2ir5h" path="res://assets/sfx/Camera-passo_iterativo.wav" id="4_fp5ra"]
+[ext_resource type="AudioStream" uid="uid://evnrpwjuyoww" path="res://assets/sfx/Objeto-esmaecer.wav" id="5_yrj5t"]
+[ext_resource type="AudioStream" uid="uid://d4jfv3up3ob7f" path="res://assets/sfx/Objeto-surgir.wav" id="6_l4e28"]
+[ext_resource type="AudioStream" uid="uid://rld53o6wdx3g" path="res://assets/sfx/Ponteiro-movimento.wav" id="7_wttib"]
+[ext_resource type="AudioStream" uid="uid://b438ibrh0sjo7" path="res://assets/sfx/Ponteiro-receber_resultado_rec_ptr_prox.wav" id="8_2s7qh"]
+[ext_resource type="AudioStream" uid="uid://cubi7ruaxoahk" path="res://assets/sfx/Ponteiro-receber_resultado_rec_ptr_lista.wav" id="9_hov25"]
+
+[node name="AudioListaLigada" type="Node2D"]
+script = ExtResource("1_sqjj1")
+
+[node name="MusicaIdle" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("2_ut1yn")
+volume_db = -15.24
+
+[node name="MusicaAlgor" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("2_n6vvl")
+volume_db = -16.865
+
+[node name="CameraAudio" type="AudioStreamPlayer" parent="."]
+volume_db = -22.487
+max_polyphony = 100
+
+[node name="Objeto" type="AudioStreamPlayer" parent="."]
+volume_db = -18.739
+max_polyphony = 100
+
+[node name="CamSupetao" type="AudioStreamPlayer" parent="."]
+volume_db = -24.445
+
+[node name="UserMv" type="AudioStreamPlayer" parent="."]
+volume_db = -17.97
+
+[node name="PassoIter" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("4_fp5ra")
+volume_db = -22.487
+
+[node name="EntraRec" type="AudioStreamPlayer" parent="."]
+volume_db = -17.801
+
+[node name="SaiRec" type="AudioStreamPlayer" parent="."]
+volume_db = -19.676
+
+[node name="Esmaecer" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("5_yrj5t")
+volume_db = -17.957
+
+[node name="Surgir" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("6_l4e28")
+volume_db = -33.424
+
+[node name="PtrMv" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("7_wttib")
+volume_db = -24.0
+
+[node name="ProxRecebe" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("8_2s7qh")
+volume_db = -19.676
+
+[node name="listaRecebe" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("9_hov25")
+volume_db = -19.676
+
+[node name="ListaRecebe" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("3_r2bmc")
+volume_db = -19.634

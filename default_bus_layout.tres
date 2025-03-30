@@ -1,0 +1,12 @@
+[gd_resource type="AudioBusLayout" load_steps=2 format=3 uid="uid://b6qiprads77h5"]
+
+[sub_resource type="AudioEffectLimiter" id="AudioEffectLimiter_qt3x4"]
+resource_name = "Limiter"
+threshold_db = -14.0
+soft_clip_db = 0.0
+soft_clip_ratio = 3.0
+
+[resource]
+bus/0/volume_db = -0.128275
+bus/0/effect/0/effect = SubResource("AudioEffectLimiter_qt3x4")
+bus/0/effect/0/enabled = true

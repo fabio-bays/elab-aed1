@@ -1,8 +1,9 @@
-[gd_scene load_steps=37 format=3 uid="uid://c5k6y55l3uasr"]
+[gd_scene load_steps=38 format=3 uid="uid://c5k6y55l3uasr"]
 
-[ext_resource type="Texture2D" uid="uid://dwtyt83jw1r1q" path="res://assets/seta_ponteiro_v2.png" id="1_tlj2v"]
+[ext_resource type="Texture2D" uid="uid://dwtyt83jw1r1q" path="res://assets/visual/seta_ponteiro_v2.png" id="1_tlj2v"]
 [ext_resource type="Script" path="res://Ponteiro.gd" id="2_7a8k8"]
 [ext_resource type="FontFile" uid="uid://5m5r5fu4xykb" path="res://assets/fontes/VT323-Regular.ttf" id="3_ri46c"]
+[ext_resource type="AudioStream" uid="uid://sywvyqbpjtlk" path="res://assets/sfx/Ponteiro-brilho.wav" id="4_0j1nc"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_wm28d"]
 atlas = ExtResource("1_tlj2v")
@@ -294,3 +295,9 @@ grow_vertical = 2
 theme_override_fonts/font = ExtResource("3_ri46c")
 theme_override_font_sizes/font_size = 5
 text = "lista"
+
+[node name="PonteiroBrilho" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource("4_0j1nc")
+volume_db = -30.0
+max_distance = 200.0
+attenuation = 3.36358

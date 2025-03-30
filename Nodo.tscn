@@ -1,9 +1,10 @@
-[gd_scene load_steps=27 format=3 uid="uid://dp75sk2nqiwgd"]
+[gd_scene load_steps=28 format=3 uid="uid://dp75sk2nqiwgd"]
 
 [ext_resource type="Script" path="res://Nodo.gd" id="1_5na5g"]
-[ext_resource type="Texture2D" uid="uid://dulb6mutxedt7" path="res://assets/esfera.png" id="2_kfi0h"]
+[ext_resource type="Texture2D" uid="uid://dulb6mutxedt7" path="res://assets/visual/esfera.png" id="2_kfi0h"]
 [ext_resource type="PackedScene" uid="uid://c5k6y55l3uasr" path="res://Ponteiro.tscn" id="3_asyfw"]
 [ext_resource type="FontFile" uid="uid://5m5r5fu4xykb" path="res://assets/fontes/VT323-Regular.ttf" id="3_pfnuk"]
+[ext_resource type="AudioStream" uid="uid://c6nism0h41kbf" path="res://assets/sfx/Objeto-Nodo-ins_concluida.wav" id="4_u35fy"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_l7skv"]
 atlas = ExtResource("2_kfi0h")
@@ -148,8 +149,8 @@ _data = {
 "info_esmaecer": SubResource("Animation_3bnpp")
 }
 
-[sub_resource type="CircleShape2D" id="CircleShape2D_tp88t"]
-radius = 4.03212
+[sub_resource type="CircleShape2D" id="CircleShape2D_pr3je"]
+radius = 3.49386
 
 [sub_resource type="Animation" id="Animation_cj3h1"]
 length = 0.001
@@ -190,7 +191,7 @@ _data = {
 }
 
 [node name="Nodo" type="Node2D"]
-position = Vector2(48, 32)
+position = Vector2(80, 50)
 script = ExtResource("1_5na5g")
 
 [node name="Esfera" type="AnimatedSprite2D" parent="."]
@@ -199,24 +200,24 @@ scale = Vector2(2, 2)
 sprite_frames = SubResource("SpriteFrames_v00ji")
 frame = 6
 frame_progress = 0.379886
+metadata/_edit_lock_ = true
 
 [node name="Info" type="Label" parent="Esfera"]
 texture_filter = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -10.5
-offset_top = -11.5
-offset_right = -5.5
-offset_bottom = -4.5
+anchors_preset = -1
+anchor_left = 0.187
+anchor_top = 0.2495
+anchor_right = 0.812
+anchor_bottom = 0.687
+offset_left = -7.992
+offset_top = -7.992
+offset_right = -7.992
+offset_bottom = -7.992
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_colors/font_color = Color(0, 0, 0, 1)
 theme_override_fonts/font = ExtResource("3_pfnuk")
 theme_override_font_sizes/font_size = 5
-text = "teste"
 horizontal_alignment = 1
 vertical_alignment = 1
 visible_characters = 0
@@ -232,8 +233,10 @@ libraries = {
 scale = Vector2(4, 4)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Esfera/Area2D"]
+position = Vector2(0, -0.25)
 scale = Vector2(0.4, 0.4)
-shape = SubResource("CircleShape2D_tp88t")
+shape = SubResource("CircleShape2D_pr3je")
+debug_color = Color(0, 0.6, 0.701961, 0.419608)
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="Esfera"]
 root_node = NodePath("../..")
@@ -241,6 +244,11 @@ libraries = {
 "": SubResource("AnimationLibrary_lhma5")
 }
 speed_scale = 0.5
+
+[node name="AudioInsConcluida" type="AudioStreamPlayer2D" parent="Esfera"]
+stream = ExtResource("4_u35fy")
+volume_db = -11.887
+max_distance = 400.0
 
 [node name="Ponteiro" parent="." instance=ExtResource("3_asyfw")]
 frame = 7

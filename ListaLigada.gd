@@ -101,6 +101,7 @@ const DISTAN_PTR_NODO = Vector2(GRID_SIZE.x * 4, 0)
 const ANIM_INTERVALO_DURACAO : float = 1.5 # em segundos
 const ANIM_ANIMACAO_DURACAO : float = .5
 
+var AudioListaLigada
 var fator_velocidade_anim : float = 1
 var label_fator_velo_anim : Label
 var modo_animacao_iterativa #-> o jogo começa com qual modo ativado?
@@ -303,17 +304,21 @@ func _ready():
 	anim_o_comeco()
 	lista = Lista.new()
 	lista.set_nulo_id($Nulo.get_instance_id())
+	AudioListaLigada = get_node('AudioListaLigada')
+	AudioListaLigada.play_mus('idle') 
 
 func _process(_delta):
 	if lista.lista.is_empty(): 
 		$Camera2D/Botoes/Remover.button_pressed = false
 
 	if Input.is_anything_pressed():
-		if !animacao_esta_acontecendo:
+		if !animacao_esta_acontecendo and lista.get_tamanho() != 0:
 			if Input.is_action_just_pressed('ui_left'):
 				set_cam_foco_nodo('esq', null)
+				await AudioListaLigada.play_sfx('user_mv_esq')
 			elif Input.is_action_just_pressed('ui_right'):
 				set_cam_foco_nodo('dir', null)
+				await AudioListaLigada.play_sfx('user_mv_dir')
 
 func _on_iterativo_toggled(toggled_on):
 	var iterativo_button = $Camera2D/Botoes/Iterativo
@@ -557,6 +562,8 @@ func anim_nodo_novo(nodo, bloco_codigo):
 	get_tree().create_tween().set_parallel().tween_property(
 		nodo, 'visible', true, 1e-9
 	)
+	nodo.get_ponteiro_scene().set_play_audio(true)
+	await AudioListaLigada.play_sfx('surgir')
 	await get_tree().create_tween().tween_property(
 	nodo, "scale", Vector2(1, 1), ANIM_ANIMACAO_DURACAO * fator_velocidade_anim / 2).from(Vector2(0.3,0.3)).finished
 
@@ -608,6 +615,7 @@ func anim_inserir_no_inicio(nodo, bloco_codigo, apontar_para_id,
 	
 	await anim_bloco_codigo_highlight_str(bloco_codigo, ['lista = novo;', 1])
 	
+	await AudioListaLigada.play_sfx('ptr_mv')
 	await get_tree().create_tween().tween_property(
 		ponteiro_cabeca, "position", nodo.position - Vector2(
 			GRID_SIZE.x * 4, 0), ANIM_ANIMACAO_DURACAO * fator_velocidade_anim).finished
@@ -620,10 +628,10 @@ func anim_inserir_no_inicio(nodo, bloco_codigo, apontar_para_id,
 	move_tudo_tween.tween_property(nodo_ponteiro, "rotation", 0, ANIM_ANIMACAO_DURACAO * fator_velocidade_anim)
 	move_tudo_tween.tween_property(nodo_ponteiro, "position", 
 								Vector2(GRID_SIZE.x * 4, 0), ANIM_ANIMACAO_DURACAO * fator_velocidade_anim)
-
 	await move_tudo_tween.tween_property(
 		ponteiro_cabeca, "global_position", apontar_para.position
 		- Vector2(GRID_SIZE.x * 12, 0), ANIM_ANIMACAO_DURACAO * fator_velocidade_anim).finished
+	nodo.force_update_transform()
 
 func anim_inserir_itr_no_meio(nodo_novo, bloco_codigo, nodo_clicado_id, 
 								nodo_anterior_id, ptr_lista_copia):
@@ -677,6 +685,7 @@ func anim_inserir_itr_no_meio(nodo_novo, bloco_codigo, nodo_clicado_id,
 	return [ponteiro_aux, ponteiro_anterior]
 
 func anim_insercao_nodo(nodo_clicado_id = null):
+	AudioListaLigada.play_mus('algor')
 	
 	animacao_esta_acontecendo = true
 	
@@ -686,7 +695,12 @@ func anim_insercao_nodo(nodo_clicado_id = null):
 	var fila_cor : Array = CORES_RETANGULOS.duplicate()
 	var ptr_lista_copia = ponteiro_scene.instantiate()
 	var rec_rect = ColorRect.new()
-
+	var random_number_g = RandomNumberGenerator.new()
+	random_number_g.randomize()
+	var random_number : int = random_number_g.randi_range(0, 100)
+	var label_x_random : Label 
+	label_x_random = Utilidades.rec_gerar_label_pos()
+	label_x_random.set_text('x = ' + str(random_number))
 	rec_rect.visible = false
 	add_child(rec_rect)
 	move_child(rec_rect, 0)
@@ -694,9 +708,10 @@ func anim_insercao_nodo(nodo_clicado_id = null):
 	if modo_animacao_iterativa:
 		var ponteiro_aux = null
 		var ponteiro_anterior = null
-		anim_set_novo_nodo_pos(nodo_novo)
 		nodo_novo.visible = false
 		add_child(nodo_novo)
+		nodo_novo.get_ponteiro_scene().set_play_audio(false)
+		nodo_novo.set_info(str(random_number))
 		
 		if cam_focando_em_nodo_idx != 0:
 			await anim_cam_focar_objeto(
@@ -704,11 +719,13 @@ func anim_insercao_nodo(nodo_clicado_id = null):
 			)
 		await anim_rec_inicio(pilha_cor, fila_cor, bloco_codigo, ponteiro, 
 								rec_rect, ptr_lista_copia)
+		await anim_x_info(label_x_random)
 		await anim_intervalo(ANIM_INTERVALO_DURACAO * fator_velocidade_anim)
 		await anim_cam_focar_objeto(
 			instance_from_id(lista.get_primeiro_nodo_id_pre_insercao()), 
 			'suave'
 		)
+		anim_set_novo_nodo_pos(nodo_novo)
 		await anim_inserir_itr_nodo_novo(nodo_novo, bloco_codigo)
 		
 		if nodo_clicado_id == null:
@@ -749,6 +766,8 @@ func anim_insercao_nodo(nodo_clicado_id = null):
 		var label_pos = Utilidades.rec_gerar_label_pos()
 		nodo_novo.visible = false
 		add_child(nodo_novo)
+		nodo_novo.get_ponteiro_scene().set_play_audio(false)
+		nodo_novo.set_info(str(random_number))
 		
 		if cam_focando_em_nodo_idx != 0:
 			await anim_cam_focar_objeto(instance_from_id(
@@ -763,26 +782,31 @@ func anim_insercao_nodo(nodo_clicado_id = null):
 		if nodo_clicado_id == null:
 			await anim_rec_inserir_no_comeco(nodo_novo, pilha_cor, fila_cor,
 				bloco_codigo, rec_rect, ptr_lista_copia, lista.get_nulo_id(),
-				label_pos)
+				label_pos, label_x_random)
 		else:
 			var nodo_anterior_ao_clic_id = lista.get_nodo_anterior_id_anim(nodo_clicado_id)
 			if nodo_anterior_ao_clic_id == null:
 				await anim_rec_inserir_no_comeco(nodo_novo, pilha_cor, fila_cor,
 					bloco_codigo, rec_rect, ptr_lista_copia, nodo_clicado_id,
-					label_pos)
+					label_pos, label_x_random)
 			else:
 				await anim_rec_inserir_no_meio(nodo_anterior_ao_clic_id, pilha_cor, 
 												fila_cor, bloco_codigo, 
 												rec_rect, ptr_lista_copia, 
-												nodo_novo, nodo_clicado_id, label_pos)
+												nodo_novo, nodo_clicado_id, label_pos,
+												label_x_random)
 	
 	set_cam_foco_nodo('nd_novo', lista.get_ultimo_nodo_inserido_id())
 	remover_bloco_codigo(bloco_codigo)
+	ptr_lista_copia.queue_free()
+	rec_rect.queue_free()
 	
+	AudioListaLigada.reset_sfx()
+	AudioListaLigada.play_mus('idle')
 	animacao_esta_acontecendo = false
 	
 func anim_remocao_nodo(nodo_clicado_id):
-	
+	AudioListaLigada.play_mus('algor')
 	animacao_esta_acontecendo = true
 	
 	var bloco_codigo = display_bloco_codigo()
@@ -859,8 +883,36 @@ func anim_remocao_nodo(nodo_clicado_id):
 	
 	set_cam_foco_nodo('rm_nodo', nodo_anterior_id)
 	remover_bloco_codigo(bloco_codigo)
+	
+	AudioListaLigada.reset_sfx()
+	AudioListaLigada.play_mus('idle')
 	animacao_esta_acontecendo = false
-		
+
+func anim_x_info(label):
+	label.position = $Camera2D.position + Vector2(0, GRID_SIZE.y * 10)
+	label.set_modulate(Color(1,1,1,0))
+	add_child(label)
+
+	get_tree().create_tween().set_parallel(true).tween_property(
+		label, 'modulate', Color(1,1,1,1), 
+		ANIM_ANIMACAO_DURACAO * fator_velocidade_anim
+	)
+	await get_tree().create_tween().tween_property(
+		label, 'position', label.position + Vector2(0, -GRID_SIZE.y * 2.5),
+		ANIM_ANIMACAO_DURACAO * fator_velocidade_anim
+	).finished
+	
+	await anim_intervalo(ANIM_INTERVALO_DURACAO)
+	
+	get_tree().create_tween().set_parallel(true).tween_property(
+		label, 'modulate', Color(1,1,1,0), 
+		ANIM_ANIMACAO_DURACAO * fator_velocidade_anim
+	)
+	await get_tree().create_tween().tween_property(
+		label, 'position', label.position + Vector2(0, -GRID_SIZE.y * 2),
+		ANIM_ANIMACAO_DURACAO * fator_velocidade_anim
+	).finished
+	
 func anim_remover_itr_primeira_pos(bloco_codigo, nodo_clicado_id, ptr_lista_copia):
 	var ponteiro_aux = ponteiro_scene.instantiate()
 	var nodo_clicado = instance_from_id(nodo_clicado_id)
@@ -901,6 +953,7 @@ func anim_remover_itr_primeira_pos(bloco_codigo, nodo_clicado_id, ptr_lista_copi
 
 	await anim_intervalo(ANIM_INTERVALO_DURACAO * fator_velocidade_anim)
 	
+	AudioListaLigada.play_sfx('esmaecer')
 	await anim_esmaecer(nodo_clicado)
 
 	await anim_intervalo(ANIM_INTERVALO_DURACAO * fator_velocidade_anim)
@@ -977,6 +1030,7 @@ func anim_remover_itr_no_meio(bloco_codigo, nodo_clicado_id, ptr_lista_copia) ->
 
 			await anim_intervalo(ANIM_INTERVALO_DURACAO * fator_velocidade_anim)
 			
+			$AudioListaLigada.play_sfx('esmaecer')
 			await anim_esmaecer(nodo_clicado)
 			
 			await anim_intervalo(ANIM_INTERVALO_DURACAO * fator_velocidade_anim)
@@ -1066,13 +1120,20 @@ func anim_cam_focar_objeto(objeto, modo : String = 'supetao'):
 		await get_tree().create_tween().tween_property($Camera2D, "position", 
 									objeto.position, ANIM_ANIMACAO_DURACAO * fator_velocidade_anim).finished
 	elif modo == 'supetao':
-		var transicao_tween = get_tree().create_tween().	\
-			set_trans(Tween.TRANS_ELASTIC)
-		transicao_tween.tween_property($Camera2D, "zoom", Vector2(0.9, 0.9), ANIM_ANIMACAO_DURACAO * fator_velocidade_anim)
-		transicao_tween.tween_property($Camera2D, "position", 
-										objeto.position, ANIM_ANIMACAO_DURACAO * fator_velocidade_anim)
-		await transicao_tween.tween_property($Camera2D, "zoom", Vector2(1, 1), 
-											ANIM_ANIMACAO_DURACAO * fator_velocidade_anim).finished
+		await AudioListaLigada.play_sfx('cam_supetao')
+		await get_tree().create_tween().set_trans(Tween.TRANS_ELASTIC).tween_property(
+			$Camera2D, "zoom", Vector2(0.9, 0.9), 
+			ANIM_ANIMACAO_DURACAO).finished
+			
+		await AudioListaLigada.play_sfx('cam_supetao')
+		await get_tree().create_tween().set_trans(Tween.TRANS_ELASTIC).tween_property(
+			$Camera2D, "position", 
+			objeto.position, 
+			ANIM_ANIMACAO_DURACAO).finished
+			
+		await AudioListaLigada.play_sfx('cam_supetao')
+		await get_tree().create_tween().set_trans(Tween.TRANS_ELASTIC).tween_property($Camera2D, "zoom", Vector2(1, 1), 
+											ANIM_ANIMACAO_DURACAO).finished
 
 func anim_mover_cam(posicao : Vector2):
 	get_tree().create_tween().tween_property(
@@ -1086,6 +1147,7 @@ func anim_ptr_surgir(o_ponteiro, posicao : Vector2, label : String):
 	o_ponteiro.set_label_text(label)
 	if !o_ponteiro.is_inside_tree():
 		add_child(o_ponteiro)
+	await AudioListaLigada.play_sfx('surgir')
 	await get_tree().create_tween().tween_property(o_ponteiro, "scale",
 													Vector2(1.5, 1.5), 
 													ANIM_ANIMACAO_DURACAO * fator_velocidade_anim / 2). \
@@ -1103,6 +1165,7 @@ func anim_ptr_apontar(ptr, posicao, rotacao, global_position = false):
 	await tween.tween_property(ptr, "rotation", deg_to_rad(rotacao), 
 								ANIM_ANIMACAO_DURACAO * fator_velocidade_anim).set_trans(
 									Tween.TRANS_ELASTIC).finished
+	await AudioListaLigada.play_sfx('ptr_mv')
 
 func anim_itr_rect_nodo_centralizado():
 	var rect_nodo_centralizado = $RectNodo.duplicate()
@@ -1306,6 +1369,7 @@ func anim_inserir_itr_no_meio_pos_igual_pos_anterior(rect_nodo,
 	var nodo_anterior_ptr = nodo_anterior.get_ponteiro_scene()
 	## Animação: fazer o ponteiro na horizontal apontar
 	await anim_intervalo(ANIM_INTERVALO_DURACAO * fator_velocidade_anim)
+	await AudioListaLigada.play_sfx('ptr_mv')
 	await get_tree().create_tween().tween_property(
 		nodo_anterior_ptr, "global_position", nodo_novo.position - Vector2(
 			GRID_SIZE.x * 4, 0), ANIM_ANIMACAO_DURACAO * fator_velocidade_anim).finished
@@ -1340,10 +1404,11 @@ func anim_itr_no_meio_pos_dif_pos_anterior(bloco_codigo, ponteiro_aux,
 
 	await anim_bloco_codigo_highlight_str(bloco_codigo, 
 				['else', 2])
-		
+	
+
 	await anim_bloco_codigo_highlight_str(bloco_codigo, 
 					['aux = aux->prox;', 2])
-
+					
 	## Animação: fazer ponteiro apontar (ponteiro_aux)
 	await anim_ptr_apontar(ponteiro_aux,  
 					ponteiro_aux.position + Vector2(GRID_SIZE.x * 8, 0)
@@ -1351,7 +1416,7 @@ func anim_itr_no_meio_pos_dif_pos_anterior(bloco_codigo, ponteiro_aux,
 	
 	await anim_bloco_codigo_highlight_str(bloco_codigo, 
 				['for(pos; pos > 0; pos--)', 1])
-
+	await AudioListaLigada.play_sfx('passo_iter')
 	await anim_itr_acompanhar_camera(rect_nodo_centralizado,
 									prox_nodo_centralizado,
 									ponteiro_anterior,
@@ -1364,6 +1429,8 @@ func anim_itr_no_meio_preparar_aux_e_anterior(rect_nodo, rect_nodo_centralizado,
 												bloco_codigo, nodo_clicado,
 												nodo_centralizado,
 												ponteiro_anterior, ponteiro_aux):
+	AudioListaLigada.play_sfx('passo_iter_ult')
+	
 	await anim_itr_rects_e_labels_desaparecendo(rect_nodo, 
 											rect_nodo_centralizado)
 	
@@ -1391,8 +1458,10 @@ func anim_itr_no_meio_preparar_aux_e_anterior(rect_nodo, rect_nodo_centralizado,
 	
 func anim_itr_return(ponteiro_aux, ponteiro_anterior, bloco_codigo):
 	if ponteiro_aux:
+		await AudioListaLigada.play_sfx('esmaecer')
 		await anim_esmaecer(ponteiro_aux)
 	if ponteiro_anterior:
+		await AudioListaLigada.play_sfx('esmaecer')
 		await anim_esmaecer(ponteiro_anterior)
 
 func anim_rec_return(rec_retan, ptr_lista_copia, fila_cor, pilha_cor, bloco_codigo,
@@ -1405,16 +1474,18 @@ func anim_rec_return(rec_retan, ptr_lista_copia, fila_cor, pilha_cor, bloco_codi
 	var ptr_chamada_anterior
 	var fator_distancia : int
 	var rect_pos : Vector2
-	
+	var sfx_ptr_lista : String 
 	if obj_chamada_anterior == ponteiro:
 		ptr_chamada_anterior = ponteiro
 		rect_pos = obj_chamada_anterior.position - 2 * GRID_SIZE
 		fator_distancia = 1
+		sfx_ptr_lista = 'Lista_recebe'
 	else:
 		ptr_chamada_anterior = obj_chamada_anterior.get_ponteiro_scene()
 		rect_pos = obj_chamada_anterior.position + DISTAN_PTR_NODO - 2 * GRID_SIZE
 		fator_distancia = 2
-
+		sfx_ptr_lista = 'lista_recebe'
+		
 	await anim_bloco_codigo_highlight_str(bloco_codigo, 
 										['return lista;', 2])
 	await anim_intervalo(ANIM_INTERVALO_DURACAO * fator_velocidade_anim)
@@ -1424,14 +1495,18 @@ func anim_rec_return(rec_retan, ptr_lista_copia, fila_cor, pilha_cor, bloco_codi
 	).finished
 	rec_retan.visible = false
 	
+	await AudioListaLigada.play_sfx('sai_rec')
+	
 	get_tree().create_tween().set_parallel().tween_method(
 		parallax_bg.set_cor, parallax_bg.get_cor(), 
 		Color(cor_chamada_anterior), ANIM_ANIMACAO_DURACAO * fator_velocidade_anim
 	)
 	
+
 	get_tree().create_tween().tween_property(
 		ptr_lista_copia, 'self_modulate', cor_retorno, ANIM_ANIMACAO_DURACAO * fator_velocidade_anim
 	).finished
+	await AudioListaLigada.play_sfx('prox_recebe')
 	
 	await get_tree().create_tween().tween_property(
 		ptr_lista_copia, 'scale', Vector2(2, 2), ANIM_ANIMACAO_DURACAO * fator_velocidade_anim
@@ -1471,12 +1546,16 @@ func anim_rec_return(rec_retan, ptr_lista_copia, fila_cor, pilha_cor, bloco_codi
 
 	obj_chamada_anterior.position.x = ptr_lista_copia.position.x -  \
 		fator_distancia*NODO_COMP_X
+	
+	if obj_chamada_anterior == ponteiro:
+		ponteiro.set_play_audio(true)
 	get_tree().create_tween().set_parallel(true).tween_property(
 		obj_chamada_anterior, 'visible', true, 1e-9)
 	await get_tree().create_tween().tween_property(
 		obj_chamada_anterior, 'modulate', 
 		Color(1, 1, 1, 1), ANIM_ANIMACAO_DURACAO * fator_velocidade_anim).from(Color(1,1,1,0)).finished
-		
+
+	await AudioListaLigada.play_sfx(sfx_ptr_lista)
 	get_tree().create_tween().set_parallel().tween_property(
 		ptr_chamada_anterior, 'scale', Vector2(2, 2), ANIM_ANIMACAO_DURACAO * fator_velocidade_anim
 	).from_current().set_trans(Tween.TRANS_EXPO).set_ease(Tween.EASE_OUT)
@@ -1557,10 +1636,15 @@ func anim_rec_inicio(pilha_cor : Array, fila_cor : Array, bloco_codigo,
 		rec_rect, 'color:a8', 255, ANIM_ANIMACAO_DURACAO * fator_velocidade_anim
 	).set_trans(Tween.TRANS_CUBIC).finished
 	
+	await AudioListaLigada.play_sfx('entra_rec')
 	await anim_rec_mover_cam(rec_rect, ptr_lista_copia, 1)
 	
 	parallax_bg.set_cor(rect_cor)
+	
 	obj_anterior.visible = false
+	if obj_anterior == ponteiro:
+		ponteiro.set_play_audio(false)
+
 	rec_rect.visible = false
 	rec_rect.color.a8 = 0
 	
@@ -1572,7 +1656,7 @@ func anim_rec_mover_cam(rect, ptr_lista_copia, sentido : int):
 	
 	
 func anim_rec_inserir_no_comeco(nodo_novo, pilha_cor, fila_cor, bloco_codigo,
-	rec_rect, ptr_lista_copia, obj_insercao_id, label_pos):
+	rec_rect, ptr_lista_copia, obj_insercao_id, label_pos, label_x_random):
 	anim_set_novo_nodo_pos(nodo_novo)
 	
 	label_pos.text = 'pos = 0'
@@ -1581,6 +1665,7 @@ func anim_rec_inserir_no_comeco(nodo_novo, pilha_cor, fila_cor, bloco_codigo,
 
 	await anim_rec_inicio(pilha_cor, fila_cor, bloco_codigo,
 						ponteiro, rec_rect, ptr_lista_copia)
+	await anim_x_info(label_x_random)
 	await anim_esmaecer(label_pos, true)
 	await anim_intervalo(ANIM_INTERVALO_DURACAO * fator_velocidade_anim)
 		
@@ -1597,7 +1682,7 @@ func anim_rec_inserir_no_comeco(nodo_novo, pilha_cor, fila_cor, bloco_codigo,
 	
 func anim_rec_inserir_no_meio(nodo_anterior_ao_clic_id, pilha_cor, fila_cor, 
 								bloco_codigo, rec_rect, ptr_lista_copia, 
-								nodo_novo, nodo_clicado_id, label_pos):
+								nodo_novo, nodo_clicado_id, label_pos, label_x_random):
 	var nodo_anterior_ao_clic = instance_from_id(
 		nodo_anterior_ao_clic_id
 	)
@@ -1608,7 +1693,7 @@ func anim_rec_inserir_no_meio(nodo_anterior_ao_clic_id, pilha_cor, fila_cor,
 	
 	await anim_rec_percorrer(
 		ultimo_nodo_inserido_id, nodo_anterior_id, pilha_cor, fila_cor, 
-		bloco_codigo, rec_rect, ptr_lista_copia, true, label_pos)
+		bloco_codigo, rec_rect, ptr_lista_copia, true, label_pos, label_x_random)
 	
 	await get_tree().create_tween().tween_property(
 		ptr_lista_copia, 'position', 
@@ -1625,6 +1710,7 @@ func anim_rec_inserir_no_meio(nodo_anterior_ao_clic_id, pilha_cor, fila_cor,
 	await anim_intervalo(ANIM_INTERVALO_DURACAO * fator_velocidade_anim)
 	await nodo_novo.esfera_stop_anim()
 
+	AudioListaLigada.play_mus('rec_ret')
 	await anim_rec_retornar_do_meio(ultimo_nodo_inserido_id, rec_rect, 
 									ptr_lista_copia, fila_cor, pilha_cor,
 									bloco_codigo, true, label_pos)
@@ -1676,6 +1762,7 @@ func anim_rec_remover_pos_zero(bloco_codigo, ptr_lista_copia, nodo_clicado_id):
 	await anim_nodo_ascender(nodo_clicado)
 	await anim_intervalo(ANIM_INTERVALO_DURACAO * fator_velocidade_anim)
 	
+	await AudioListaLigada.play_sfx('esmaecer')
 	await anim_esmaecer(nodo_clicado)
 	await anim_intervalo(ANIM_INTERVALO_DURACAO * fator_velocidade_anim)
 	
@@ -1687,12 +1774,13 @@ func anim_rec_remover_pos_zero(bloco_codigo, ptr_lista_copia, nodo_clicado_id):
 	await anim_intervalo(ANIM_INTERVALO_DURACAO * fator_velocidade_anim)
 	
 	await anim_bloco_codigo_highlight_str(bloco_codigo, ['return lista;', 2])
+	await AudioListaLigada.play_sfx('esmaecer')
 	await anim_esmaecer(ponteiro_aux)
 	await anim_intervalo(ANIM_INTERVALO_DURACAO * fator_velocidade_anim)
 	
 func anim_rec_percorrer(nodo_parada_id, nodo_anterior_id,
 						pilha_cor, fila_cor, bloco_codigo, rec_rect,
-						ptr_lista_copia, eh_insercao : bool, label_pos):
+						ptr_lista_copia, eh_insercao : bool, label_pos, label_x_random = null):
 	var nodo_anterior
 	
 	var label_pos_idx = lista.get_nodo_id_idx(nodo_parada_id)
@@ -1707,6 +1795,8 @@ func anim_rec_percorrer(nodo_parada_id, nodo_anterior_id,
 								ponteiro, rec_rect, 
 								ptr_lista_copia)
 			await anim_esmaecer(label_pos, true)
+			if label_x_random:
+				await anim_x_info(label_x_random)
 		else:
 			nodo_anterior = instance_from_id(nodo_anterior_id)
 			await get_tree().create_tween().tween_property(
@@ -1762,7 +1852,7 @@ func anim_rec_remover_do_meio(nodo_clicado_id, nodo_anterior_ao_clic_id, pilha_c
 	
 	await anim_rec_percorrer(nodo_clicado_id, nodo_anterior_id,
 		pilha_cor, fila_cor, bloco_codigo, rec_rect, ptr_lista_copia, false,
-		label_pos)
+		label_pos, null)
 		
 	await get_tree().create_tween().tween_property(
 		ptr_lista_copia, 'position', 
@@ -1774,6 +1864,7 @@ func anim_rec_remover_do_meio(nodo_clicado_id, nodo_anterior_ao_clic_id, pilha_c
 							
 	await anim_rec_remover_pos_zero(bloco_codigo, ptr_lista_copia, nodo_clicado_id)
 	
+	AudioListaLigada.play_mus('rec_ret')
 	await anim_rec_retornar_do_meio(nodo_clicado_id, rec_rect,
 									ptr_lista_copia, fila_cor, pilha_cor, 
 									bloco_codigo, false, label_pos)

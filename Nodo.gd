@@ -55,7 +55,7 @@ func _on_area_2d_input_event(_viewport, event, _shape_idx):
 	if event.is_action_pressed("clique_esquerdo"):
 		var nodo_id = get_instance_id()
 		var esfera_area2d = $Esfera/Area2D
-		
+
 		if inserir_toggled_on:
 			esfera_area2d.disconnect('mouse_exited', _on_area_2d_mouse_exited)
 			nodo_clicado.emit(nodo_id, 1) # acao: 1 = inserir, 2 = remover
@@ -75,6 +75,7 @@ func get_ponteiro_scene():
 	return $Ponteiro
 	
 func esfera_stop_anim():
+	$Esfera/AudioInsConcluida.play()
 	await get_tree().create_tween().set_trans(Tween.TRANS_EXPO). \
 		tween_method(
 			$Esfera/AnimationPlayer.seek, 
@@ -85,3 +86,8 @@ func anim_set_scale(new_scale : Vector2, anim_duracao : float):
 	await get_tree().create_tween().tween_property(
 		self, 'scale', new_scale, anim_duracao
 	).finished 
+	
+func set_info(info : String):
+	$Esfera/Info.text = info
+
+

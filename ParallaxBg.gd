@@ -10,3 +10,5 @@ func set_cor(cor):
 
 func get_cor():
 	return color_rect.color
+	
+

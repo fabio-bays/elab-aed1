@@ -1,13 +1,22 @@
-[gd_scene load_steps=48 format=3 uid="uid://desbg5gu8oygl"]
+[gd_scene load_steps=52 format=3 uid="uid://desbg5gu8oygl"]
 
 [ext_resource type="Script" path="res://ListaLigada.gd" id="1_eru8n"]
 [ext_resource type="PackedScene" uid="uid://dp75sk2nqiwgd" path="res://Nodo.tscn" id="2_nlber"]
 [ext_resource type="PackedScene" uid="uid://brb3nqnenyjq0" path="res://BlocoCodigo.tscn" id="3_ca5c3"]
 [ext_resource type="FontFile" uid="uid://5m5r5fu4xykb" path="res://assets/fontes/VT323-Regular.ttf" id="3_op5oh"]
-[ext_resource type="Texture2D" uid="uid://cqq8u1c5d2bry" path="res://assets/null_v2.png" id="3_wjsaj"]
-[ext_resource type="Texture2D" uid="uid://c3qn4p6rbyqxi" path="res://assets/remover_x.png" id="4_5068l"]
+[ext_resource type="Texture2D" uid="uid://cqq8u1c5d2bry" path="res://assets/visual/null_v2.png" id="3_wjsaj"]
+[ext_resource type="Texture2D" uid="uid://c3qn4p6rbyqxi" path="res://assets/visual/remover_x.png" id="4_5068l"]
 [ext_resource type="PackedScene" uid="uid://c5k6y55l3uasr" path="res://Ponteiro.tscn" id="4_hp48o"]
+[ext_resource type="Texture2D" uid="uid://bj12kio2kcydc" path="res://assets/visual/icones/botao-add_nodo_0001.png" id="7_nbkkg"]
+[ext_resource type="Texture2D" uid="uid://bw6kfgm8pharf" path="res://assets/visual/icones/botao-add_nodo_0002.png" id="8_356x8"]
 [ext_resource type="PackedScene" uid="uid://bxyf0o6ucpnv2" path="res://ParallaxBg.tscn" id="8_jcx3j"]
+[ext_resource type="PackedScene" uid="uid://bkb8gywoxw0g6" path="res://Audio.tscn" id="9_b0x7n"]
+
+[sub_resource type="AnimatedTexture" id="AnimatedTexture_x6mcm"]
+frames = 2
+frame_0/texture = ExtResource("7_nbkkg")
+frame_1/texture = ExtResource("8_356x8")
+frame_1/duration = 1.0
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_45wa7"]
 atlas = ExtResource("3_wjsaj")
@@ -309,13 +318,15 @@ offset_bottom = 96.0
 [node name="Botoes" type="Node2D" parent="Camera2D"]
 
 [node name="Inserir" type="Button" parent="Camera2D/Botoes"]
-offset_left = 16.0
-offset_top = 56.0
-offset_right = 75.0
-offset_bottom = 87.0
+offset_left = 32.0
+offset_top = 48.0
+offset_right = 91.0
+offset_bottom = 88.0
 theme_override_fonts/font = ExtResource("3_op5oh")
 toggle_mode = true
-text = "Inserir"
+icon = SubResource("AnimatedTexture_x6mcm")
+flat = true
+icon_alignment = 1
 metadata/_edit_use_anchors_ = true
 
 [node name="Remover" type="Button" parent="Camera2D/Botoes"]
@@ -432,6 +443,8 @@ horizontal_alignment = 1
 
 [node name="ParallaxBg" parent="." instance=ExtResource("8_jcx3j")]
 metadata/_edit_lock_ = true
+
+[node name="AudioListaLigada" parent="." instance=ExtResource("9_b0x7n")]
 
 [connection signal="pressed" from="Camera2D/Botoes/Inserir" to="." method="_on_inserir_pressed"]
 [connection signal="toggled" from="Camera2D/Botoes/Inserir" to="." method="_on_inserir_toggled"]

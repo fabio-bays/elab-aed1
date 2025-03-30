@@ -3,6 +3,7 @@
 [ext_resource type="Script" path="res://ParallaxBg.gd" id="1_02el5"]
 
 [node name="ParallaxBg" type="Node2D" node_paths=PackedStringArray("color_rect", "parallax_layer")]
+z_index = -1
 script = ExtResource("1_02el5")
 color_rect = NodePath("ParallaxBackground/ParallaxLayer/ColorRect")
 parallax_layer = NodePath("ParallaxBackground/ParallaxLayer")
@@ -19,4 +20,5 @@ anchor_bottom = 0.5
 offset_right = 640.0
 offset_bottom = 360.0
 grow_vertical = 2
+mouse_filter = 2
 color = Color(0.0705882, 0.0666667, 0.0862745, 1)
