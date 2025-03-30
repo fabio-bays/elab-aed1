@@ -298,6 +298,6 @@ text = "lista"
 
 [node name="PonteiroBrilho" type="AudioStreamPlayer2D" parent="."]
 stream = ExtResource("4_0j1nc")
-volume_db = -30.0
+volume_db = -40.0
 max_distance = 200.0
 attenuation = 3.36358

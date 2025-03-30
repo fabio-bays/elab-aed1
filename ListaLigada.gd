@@ -104,7 +104,7 @@ const ANIM_ANIMACAO_DURACAO : float = .5
 var AudioListaLigada
 var fator_velocidade_anim : float = 1
 var label_fator_velo_anim : Label
-var modo_animacao_iterativa #-> o jogo começa com qual modo ativado?
+var modo_animacao_iterativa 
 var lista
 var cam_focando_em_nodo_idx : int = 0
 var animacao_esta_acontecendo : bool = false
@@ -305,7 +305,8 @@ func _ready():
 	lista = Lista.new()
 	lista.set_nulo_id($Nulo.get_instance_id())
 	AudioListaLigada = get_node('AudioListaLigada')
-	AudioListaLigada.play_mus('idle') 
+	AudioListaLigada.play_mus('idle')
+	modo_animacao_iterativa = true
 
 func _process(_delta):
 	if lista.lista.is_empty(): 
@@ -459,7 +460,7 @@ func set_label_fator_velo_anim():
 	label_fator_velo_anim.add_theme_font_override('font', FONTE_TEXTOS)
 	label_fator_velo_anim.position = $Camera2D.position + \
 									Vector2(16 * GRID_SIZE.x, 
-											GRID_SIZE.y * 5.3)
+											GRID_SIZE.y * 4.5)
 	label_fator_velo_anim.add_theme_font_size_override('font_size', 12)
 	label_fator_velo_anim.set_text(str(fator_velocidade_anim) + 'x')
 	$Camera2D.add_child(label_fator_velo_anim)

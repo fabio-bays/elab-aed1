@@ -247,7 +247,7 @@ speed_scale = 0.5
 
 [node name="AudioInsConcluida" type="AudioStreamPlayer2D" parent="Esfera"]
 stream = ExtResource("4_u35fy")
-volume_db = -11.887
+volume_db = -18.0
 max_distance = 400.0
 
 [node name="Ponteiro" parent="." instance=ExtResource("3_asyfw")]

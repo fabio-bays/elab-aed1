@@ -1,4 +1,4 @@
-[gd_scene load_steps=49 format=3 uid="uid://desbg5gu8oygl"]
+[gd_scene load_steps=91 format=3 uid="uid://desbg5gu8oygl"]
 
 [ext_resource type="Script" path="res://ListaLigada.gd" id="1_eru8n"]
 [ext_resource type="PackedScene" uid="uid://dp75sk2nqiwgd" path="res://Nodo.tscn" id="2_nlber"]
@@ -7,8 +7,110 @@
 [ext_resource type="Texture2D" uid="uid://cqq8u1c5d2bry" path="res://assets/visual/null_v2.png" id="3_wjsaj"]
 [ext_resource type="Texture2D" uid="uid://c3qn4p6rbyqxi" path="res://assets/visual/remover_x.png" id="4_5068l"]
 [ext_resource type="PackedScene" uid="uid://c5k6y55l3uasr" path="res://Ponteiro.tscn" id="4_hp48o"]
+[ext_resource type="Texture2D" uid="uid://ddgkj1m7y3uuf" path="res://assets/visual/icones_botoes/botao-add_nodo_0001.png" id="7_k754d"]
+[ext_resource type="Texture2D" uid="uid://boj6sds1vky8k" path="res://assets/visual/icones_botoes/botao-add_nodo_0002.png" id="8_5d2kh"]
+[ext_resource type="Texture2D" uid="uid://disaowj20y6nf" path="res://assets/visual/icones_botoes/botao-del_nodo_0001.png" id="8_7yktq"]
 [ext_resource type="PackedScene" uid="uid://bxyf0o6ucpnv2" path="res://ParallaxBg.tscn" id="8_jcx3j"]
 [ext_resource type="PackedScene" uid="uid://bkb8gywoxw0g6" path="res://Audio.tscn" id="9_b0x7n"]
+[ext_resource type="Texture2D" uid="uid://sdiupxdnweb4" path="res://assets/visual/icones_botoes/botao-del_nodo_0002.png" id="9_brt7u"]
+[ext_resource type="Texture2D" uid="uid://ce01psd2rhl8v" path="res://assets/visual/icones_botoes/botao_iterativo/botao-iter_0001.png" id="10_4i8i2"]
+[ext_resource type="Texture2D" uid="uid://cl7xdbyupgeeo" path="res://assets/visual/icones_botoes/botao_iterativo/botao-iter_0002.png" id="11_t4wc2"]
+[ext_resource type="Texture2D" uid="uid://cbooa7tg24no7" path="res://assets/visual/icones_botoes/botao_iterativo/botao-iter_0003.png" id="12_ecgc3"]
+[ext_resource type="Texture2D" uid="uid://cjqjhywlcjsd8" path="res://assets/visual/icones_botoes/botao_iterativo/botao-iter_0004.png" id="13_2fr06"]
+[ext_resource type="Texture2D" uid="uid://dib5webuxk02k" path="res://assets/visual/icones_botoes/botao_iterativo/botao-iter_0005.png" id="14_p8myi"]
+[ext_resource type="Texture2D" uid="uid://c3ci3u15w28bt" path="res://assets/visual/icones_botoes/botao_iterativo/botao-iter_0006.png" id="15_u83gt"]
+[ext_resource type="Texture2D" uid="uid://cv4jvouwm1pbo" path="res://assets/visual/icones_botoes/botao_iterativo/botao-iter_0007.png" id="16_je5mm"]
+[ext_resource type="Texture2D" uid="uid://cpjr3ygnpihcs" path="res://assets/visual/icones_botoes/botao_iterativo/botao-iter_0008.png" id="17_slcoy"]
+[ext_resource type="Texture2D" uid="uid://c12el5yp3e1ts" path="res://assets/visual/icones_botoes/botao_recursivo/botao-rec_0001.png" id="18_5cqk2"]
+[ext_resource type="Texture2D" uid="uid://dewcr7jgvvtth" path="res://assets/visual/icones_botoes/botao_recursivo/botao-rec_0002.png" id="19_bqhay"]
+[ext_resource type="Texture2D" uid="uid://cw151m3b5gnls" path="res://assets/visual/icones_botoes/botao_recursivo/botao-rec_0003.png" id="20_m6my6"]
+[ext_resource type="Texture2D" uid="uid://dtk2rfuvw8am1" path="res://assets/visual/icones_botoes/botao_recursivo/botao-rec_0012.png" id="21_euc2j"]
+[ext_resource type="Texture2D" uid="uid://bdwrt7f4odyme" path="res://assets/visual/icones_botoes/botao_recursivo/botao-rec_0013.png" id="22_5umg7"]
+[ext_resource type="Texture2D" uid="uid://bqltdr4jb2lic" path="res://assets/visual/icones_botoes/botao_recursivo/botao-rec_0014.png" id="23_e1hb2"]
+[ext_resource type="Texture2D" uid="uid://ckqklwwyymya" path="res://assets/visual/icones_botoes/botao_recursivo/botao-rec_0015.png" id="24_4ircc"]
+[ext_resource type="Texture2D" uid="uid://byy372ukestk" path="res://assets/visual/icones_botoes/botao_recursivo/botao-rec_0016.png" id="25_1ykh7"]
+[ext_resource type="Texture2D" uid="uid://cspu53p48x7kr" path="res://assets/visual/icones_botoes/botao_recursivo/botao-rec_0017.png" id="26_32wx6"]
+[ext_resource type="Texture2D" uid="uid://dpl5u7c1v8m2n" path="res://assets/visual/icones_botoes/botao_recursivo/botao-rec_0018.png" id="27_56g2h"]
+[ext_resource type="Texture2D" uid="uid://bu67x6oey1kpm" path="res://assets/visual/icones_botoes/botao_recursivo/botao-rec_0019.png" id="28_q3ctq"]
+[ext_resource type="Texture2D" uid="uid://c217bfuyjhgs8" path="res://assets/visual/icones_botoes/botao_recursivo/botao-rec_0020.png" id="29_rw3jg"]
+[ext_resource type="Texture2D" uid="uid://dtkv25l61xtm1" path="res://assets/visual/icones_botoes/botao_recursivo/botao-rec_0021.png" id="30_4laj4"]
+[ext_resource type="Texture2D" uid="uid://de8ry1ionahr2" path="res://assets/visual/icones_botoes/botao_recursivo/botao-rec_0004.png" id="31_d7e1p"]
+[ext_resource type="Texture2D" uid="uid://cmwehpapgfiwx" path="res://assets/visual/icones_botoes/botao_recursivo/botao-rec_0022.png" id="32_bu5c8"]
+[ext_resource type="Texture2D" uid="uid://d3ilah3ylbc0w" path="res://assets/visual/icones_botoes/botao_recursivo/botao-rec_0005.png" id="33_pwhw3"]
+[ext_resource type="Texture2D" uid="uid://dpfmu3ypojkv" path="res://assets/visual/icones_botoes/botao_recursivo/botao-rec_0006.png" id="34_x7bex"]
+[ext_resource type="Texture2D" uid="uid://bb280o4fbhe8k" path="res://assets/visual/icones_botoes/botao_recursivo/botao-rec_0007.png" id="35_dp4h0"]
+[ext_resource type="Texture2D" uid="uid://bm5afbn8ymain" path="res://assets/visual/icones_botoes/botao_recursivo/botao-rec_0008.png" id="36_1835h"]
+[ext_resource type="Texture2D" uid="uid://cw8wkxivggfo2" path="res://assets/visual/icones_botoes/botao_recursivo/botao-rec_0009.png" id="37_hdjg0"]
+[ext_resource type="Texture2D" uid="uid://de1vrsjjut5cf" path="res://assets/visual/icones_botoes/botao_recursivo/botao-rec_0010.png" id="38_i3p0h"]
+[ext_resource type="Texture2D" uid="uid://dhkawx7ulva7m" path="res://assets/visual/icones_botoes/botao_recursivo/botao-rec_0011.png" id="39_ujx8l"]
+[ext_resource type="Texture2D" uid="uid://dvgsa2v14phk2" path="res://assets/visual/icones_botoes/botao-pausar_0001.png" id="40_2c08h"]
+[ext_resource type="Texture2D" uid="uid://c2nk4pbjx4emp" path="res://assets/visual/icones_botoes/botao-pausar_0002.png" id="41_job36"]
+[ext_resource type="Texture2D" uid="uid://dexru1kb43utt" path="res://assets/visual/icones_botoes/botao-acelerar_0001.png" id="42_xs6xf"]
+[ext_resource type="Texture2D" uid="uid://b4mepkmhno02a" path="res://assets/visual/icones_botoes/botao-acelerar_0002.png" id="43_5u05g"]
+[ext_resource type="Texture2D" uid="uid://borsdigl3ixts" path="res://assets/visual/icones_botoes/botao-desacelerar_0001.png" id="44_hhr4p"]
+[ext_resource type="Texture2D" uid="uid://cvp7me7g4ws87" path="res://assets/visual/icones_botoes/botao-desacelerar_0002.png" id="45_ntsy1"]
+
+[sub_resource type="AnimatedTexture" id="AnimatedTexture_gfqkt"]
+frames = 7
+speed_scale = 10.0
+frame_0/texture = ExtResource("11_t4wc2")
+frame_1/texture = ExtResource("12_ecgc3")
+frame_1/duration = 1.0
+frame_2/texture = ExtResource("13_2fr06")
+frame_2/duration = 1.0
+frame_3/texture = ExtResource("14_p8myi")
+frame_3/duration = 1.0
+frame_4/texture = ExtResource("15_u83gt")
+frame_4/duration = 1.0
+frame_5/texture = ExtResource("16_je5mm")
+frame_5/duration = 1.0
+frame_6/texture = ExtResource("17_slcoy")
+frame_6/duration = 1.0
+
+[sub_resource type="AnimatedTexture" id="AnimatedTexture_aoj2d"]
+frames = 21
+speed_scale = 12.0
+frame_0/texture = ExtResource("19_bqhay")
+frame_1/texture = ExtResource("20_m6my6")
+frame_1/duration = 1.0
+frame_2/texture = ExtResource("31_d7e1p")
+frame_2/duration = 1.0
+frame_3/texture = ExtResource("33_pwhw3")
+frame_3/duration = 1.0
+frame_4/texture = ExtResource("34_x7bex")
+frame_4/duration = 1.0
+frame_5/texture = ExtResource("35_dp4h0")
+frame_5/duration = 1.0
+frame_6/texture = ExtResource("36_1835h")
+frame_6/duration = 1.0
+frame_7/texture = ExtResource("37_hdjg0")
+frame_7/duration = 1.0
+frame_8/texture = ExtResource("38_i3p0h")
+frame_8/duration = 1.0
+frame_9/texture = ExtResource("39_ujx8l")
+frame_9/duration = 1.0
+frame_10/texture = ExtResource("21_euc2j")
+frame_10/duration = 1.0
+frame_11/texture = ExtResource("22_5umg7")
+frame_11/duration = 1.0
+frame_12/texture = ExtResource("23_e1hb2")
+frame_12/duration = 1.0
+frame_13/texture = ExtResource("24_4ircc")
+frame_13/duration = 1.0
+frame_14/texture = ExtResource("25_1ykh7")
+frame_14/duration = 1.0
+frame_15/texture = ExtResource("26_32wx6")
+frame_15/duration = 1.0
+frame_16/texture = ExtResource("27_56g2h")
+frame_16/duration = 1.0
+frame_17/texture = ExtResource("28_q3ctq")
+frame_17/duration = 1.0
+frame_18/texture = ExtResource("29_rw3jg")
+frame_18/duration = 1.0
+frame_19/texture = ExtResource("30_4laj4")
+frame_19/duration = 1.0
+frame_20/texture = ExtResource("32_bu5c8")
+frame_20/duration = 1.0
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_45wa7"]
 atlas = ExtResource("3_wjsaj")
@@ -309,74 +411,70 @@ offset_bottom = 96.0
 
 [node name="Botoes" type="Node2D" parent="Camera2D"]
 
-[node name="Inserir" type="Button" parent="Camera2D/Botoes"]
-offset_left = 16.0
+[node name="Inserir" type="TextureButton" parent="Camera2D/Botoes"]
+offset_left = 72.0
 offset_top = 56.0
-offset_right = 75.0
+offset_right = 104.0
 offset_bottom = 88.0
-theme_override_fonts/font = ExtResource("3_op5oh")
 toggle_mode = true
-text = "Inserir"
-icon_alignment = 1
+texture_normal = ExtResource("7_k754d")
+texture_pressed = ExtResource("8_5d2kh")
 
-[node name="Remover" type="Button" parent="Camera2D/Botoes"]
-offset_left = 80.0
+[node name="Remover" type="TextureButton" parent="Camera2D/Botoes"]
+offset_left = 112.0
 offset_top = 56.0
-offset_right = 158.0
-offset_bottom = 87.0
-theme_override_fonts/font = ExtResource("3_op5oh")
+offset_right = 144.0
+offset_bottom = 88.0
 toggle_mode = true
-text = "Remover"
-metadata/_edit_use_anchors_ = true
+texture_normal = ExtResource("8_7yktq")
+texture_pressed = ExtResource("9_brt7u")
 
-[node name="Iterativo" type="Button" parent="Camera2D/Botoes"]
-offset_left = -32.0
+[node name="Iterativo" type="TextureButton" parent="Camera2D/Botoes"]
+offset_left = -34.0
 offset_top = -88.0
-offset_right = -6.0
-offset_bottom = -75.0
-theme_override_fonts/font = ExtResource("3_op5oh")
-theme_override_font_sizes/font_size = 5
+offset_right = -2.0
+offset_bottom = -56.0
 toggle_mode = true
-text = "Iterativo"
+button_pressed = true
+texture_normal = ExtResource("10_4i8i2")
+texture_pressed = SubResource("AnimatedTexture_gfqkt")
 
-[node name="Recursivo" type="Button" parent="Camera2D/Botoes"]
-offset_left = 8.0
+[node name="Recursivo" type="TextureButton" parent="Camera2D/Botoes"]
 offset_top = -88.0
-offset_right = 34.0
-offset_bottom = -75.0
-theme_override_fonts/font = ExtResource("3_op5oh")
-theme_override_font_sizes/font_size = 5
+offset_right = 32.0
+offset_bottom = -56.0
 toggle_mode = true
-text = "Recursivo"
+texture_normal = ExtResource("18_5cqk2")
+texture_pressed = SubResource("AnimatedTexture_aoj2d")
 
-[node name="Acelerar" type="Button" parent="Camera2D/Botoes"]
-visible = false
-offset_left = 128.0
-offset_top = 56.0
-offset_right = 152.0
-offset_bottom = 81.0
-theme_override_fonts/font = ExtResource("3_op5oh")
-text = ">>"
-
-[node name="Desacelerar" type="Button" parent="Camera2D/Botoes"]
-visible = false
-offset_left = 64.0
-offset_top = 56.0
-offset_right = 88.0
-offset_bottom = 81.0
-theme_override_fonts/font = ExtResource("3_op5oh")
-text = "<<"
-
-[node name="Pausar" type="Button" parent="Camera2D/Botoes"]
+[node name="Pausar" type="TextureButton" parent="Camera2D/Botoes"]
 process_mode = 3
 visible = false
-offset_left = 96.0
-offset_top = 56.0
+offset_left = 88.0
+offset_top = 48.0
 offset_right = 120.0
-offset_bottom = 81.0
-theme_override_fonts/font = ExtResource("3_op5oh")
+offset_bottom = 80.0
 toggle_mode = true
-text = "||"
+texture_normal = ExtResource("40_2c08h")
+texture_pressed = ExtResource("41_job36")
+
+[node name="Acelerar" type="TextureButton" parent="Camera2D/Botoes"]
+visible = false
+offset_left = 120.0
+offset_top = 48.0
+offset_right = 152.0
+offset_bottom = 80.0
+texture_normal = ExtResource("42_xs6xf")
+texture_pressed = ExtResource("43_5u05g")
+
+[node name="Desacelerar" type="TextureButton" parent="Camera2D/Botoes"]
+visible = false
+offset_left = 56.0
+offset_top = 48.0
+offset_right = 88.0
+offset_bottom = 80.0
+texture_normal = ExtResource("44_hhr4p")
+texture_pressed = ExtResource("45_ntsy1")
 
 [node name="Nulo" type="AnimatedSprite2D" parent="."]
 texture_filter = 1
@@ -436,12 +534,11 @@ metadata/_edit_lock_ = true
 
 [node name="AudioListaLigada" parent="." instance=ExtResource("9_b0x7n")]
 
-[connection signal="pressed" from="Camera2D/Botoes/Inserir" to="." method="_on_inserir_pressed"]
 [connection signal="toggled" from="Camera2D/Botoes/Inserir" to="." method="_on_inserir_toggled"]
 [connection signal="toggled" from="Camera2D/Botoes/Remover" to="." method="_on_remover_toggled"]
 [connection signal="toggled" from="Camera2D/Botoes/Iterativo" to="." method="_on_iterativo_toggled"]
 [connection signal="toggled" from="Camera2D/Botoes/Recursivo" to="." method="_on_recursivo_toggled"]
+[connection signal="toggled" from="Camera2D/Botoes/Pausar" to="." method="_on_pausar_toggled"]
 [connection signal="pressed" from="Camera2D/Botoes/Acelerar" to="." method="_on_acelerar_pressed"]
 [connection signal="pressed" from="Camera2D/Botoes/Desacelerar" to="." method="_on_desacelerar_pressed"]
-[connection signal="toggled" from="Camera2D/Botoes/Pausar" to="." method="_on_pausar_toggled"]
 [connection signal="input_event" from="Nulo/Area2D" to="." method="_on_nulo_area_2d_input_event"]

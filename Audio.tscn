@@ -19,6 +19,7 @@ stream = ExtResource("2_ut1yn")
 volume_db = -15.24
 
 [node name="MusicaAlgor" type="AudioStreamPlayer" parent="."]
+process_mode = 3
 stream = ExtResource("2_n6vvl")
 volume_db = -16.865
 
