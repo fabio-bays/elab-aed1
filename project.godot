@@ -15,6 +15,10 @@ run/main_scene="res://ListaLigada.tscn"
 config/features=PackedStringArray("4.2", "GL Compatibility")
 config/icon="res://assets/icon.svg"
 
+[audio]
+
+buses/default_bus_layout="res://audio_bus_padrao.tres"
+
 [display]
 
 window/size/viewport_width=320

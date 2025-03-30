@@ -1,6 +1,5 @@
 extends Node2D
 
-const mus_idle : AudioStreamWAV = preload("res://assets/musica/Idle2.wav")
 const mus_algor : AudioStreamWAV = preload("res://assets/musica/Algoritmo.wav")
 const mus_rec_ret : AudioStreamWAV = preload("res://assets/musica/Recursivo_Return.wav")
 
