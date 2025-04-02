@@ -1,8 +1,8 @@
 [gd_scene load_steps=11 format=3 uid="uid://bkb8gywoxw0g6"]
 
 [ext_resource type="Script" path="res://Audio.gd" id="1_sqjj1"]
+[ext_resource type="AudioStream" uid="uid://hciq0k86knkb" path="res://assets/musica/Idle2.wav" id="2_2v7lj"]
 [ext_resource type="AudioStream" uid="uid://j0plutrjfxtc" path="res://assets/musica/Algoritmo.wav" id="2_n6vvl"]
-[ext_resource type="AudioStream" uid="uid://bj3i85nx3maxm" path="res://assets/musica/Idle2_.wav" id="2_ut1yn"]
 [ext_resource type="AudioStream" uid="uid://ci5xfll1d1rhu" path="res://assets/sfx/Ponteiro-receber_resultado_rec_ptr_Lis.wav" id="3_r2bmc"]
 [ext_resource type="AudioStream" uid="uid://dxecfjrc2ir5h" path="res://assets/sfx/Camera-passo_iterativo.wav" id="4_fp5ra"]
 [ext_resource type="AudioStream" uid="uid://evnrpwjuyoww" path="res://assets/sfx/Objeto-esmaecer.wav" id="5_yrj5t"]
@@ -15,7 +15,7 @@
 script = ExtResource("1_sqjj1")
 
 [node name="MusicaIdle" type="AudioStreamPlayer" parent="."]
-stream = ExtResource("2_ut1yn")
+stream = ExtResource("2_2v7lj")
 volume_db = -15.24
 
 [node name="MusicaAlgor" type="AudioStreamPlayer" parent="."]

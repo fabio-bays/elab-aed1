@@ -13,7 +13,9 @@ config_version=5
 config/name="Elab:aed 1"
 run/main_scene="res://ListaLigada.tscn"
 config/features=PackedStringArray("4.2", "GL Compatibility")
-config/icon="res://assets/icon.svg"
+config/icon="res://assets/visual/icones_botoes/botao-add_nodo_0001.png"
+config/macos_native_icon="res://assets/visual/icones_botoes/botao-add_nodo_0001.png"
+config/windows_native_icon="res://assets/visual/icones_botoes/botao-add_nodo_0001.png"
 
 [audio]
 
